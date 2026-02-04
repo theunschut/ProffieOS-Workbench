@@ -381,6 +381,7 @@ var sending = false;
 var callback_queue = [];
 var last_callback;
 var status_cb;
+var use_tagging = false;
 
 var buffer = "";
 var track_lines;
@@ -471,7 +472,8 @@ function RunWatchDog() {
   }
 }
 
-function Send(cmd) {
+function Send2(cmd) {
+  // console.log("Send2: "+cmd);
   var data = new TextEncoder('utf-8').encode(cmd + '\n');
   // console.log(usb_device);
   if (usb_device) {
@@ -507,6 +509,62 @@ function Send(cmd) {
     if (!sending) SendNext();
   });
 }
+
+var tag_number = 1;
+
+async function Send(cmd, retry = false) {
+  if (use_tagging) {
+    for (var retries = 0; retries < 20; retries++) {
+      tag_number++;
+      const str = await Send2(tag_number + "| " + cmd);
+      //      console.log("Send2 output: "+str);
+      var lines = str.split('\n');
+      var output_lines = [];
+      var fail = false;
+      for (var i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const index = line.indexOf('|');
+	const pre = line.slice(0, index).split(",");
+	const post = line.slice(index + 1);
+	if (pre.length != 3) {
+	  // Just discard this line, don't fail.
+          // console.log("Fail1: " + line);
+          break;
+	}
+	if (parseInt(pre[2]) != tag_number) {
+	  // Just discard this line, don't fail.
+	  console.log("Fail2: " + line);
+	  break;
+	}
+	if (post.length != parseInt(pre[1])) {
+	  console.log("Fail3: " + line +" (" + post.length +" != "+ parseInt(pre[1]) + ")");
+	  fail = true;
+	  break;
+	}
+	if (output_lines.length != parseInt(pre[0]) - 1) {
+	  console.log("Fail4: " + line);
+	  fail = true;
+	  break;
+	}
+        output_lines.push(post);
+      }
+      if (!fail) {
+        // console.log("final output: "+output_lines);
+        return output_lines.join("\n");
+      }
+      if (!retry) return "";
+
+      console.log("Retry! " + output_lines);
+
+      // Short sleep before we retry
+      await sleep(50);
+    }
+    return "";
+  } else {
+    return await Send2(cmd);
+  }
+}
+
 
 function OnStatus(event) {
   console.log("ONSTATUS");
@@ -1123,7 +1181,7 @@ function UpdatePresets() {
 }
 
 async function generateBoolSetting(base_cmd, variable, label) {
-  var value = await Send("get_" + base_cmd + " " + variable);
+  var value = await Send("get_" + base_cmd + " " + variable, true);
   if (value.startsWith("Whut?")) return "";
   if (value.trim() == "") return "";
   var checked = parseFloat(value) > 0.5 ? "checked" : "";
@@ -1139,7 +1197,7 @@ function SaveBoolSetting(base_cmd, variable) {
 
 // Single cmd queries and sets value.
 async function generateSimpleBoolSetting(cmd, label) {
-  var value = await Send(cmd);
+  var value = await Send(cmd, true);
   if (value.startsWith("Whut?")) return "";
   if (value.trim() == "") return "";
   var checked = parseFloat(value) > 0.5 ? "checked" : "";
@@ -1154,7 +1212,7 @@ function SaveSimpleBoolSetting(cmd) {
 }
 
 async function generateIntSetting(base_cmd, variable, label) {
-  var value = await Send("get_" + base_cmd + " " + variable);
+  var value = await Send("get_" + base_cmd + " " + variable, true);
   if (value.startsWith("Whut?")) return "";
   if (value.trim() == "") return "";
   value = Math.round(parseFloat(value));
@@ -1172,12 +1230,12 @@ async function UpdateSettings() {
   FIND("settings_pane2").innerHTML = "...";
   var html = "";
   html += await generateSimpleBoolSetting("sd", "sd card access");
-  var dimming = await Send("get_blade_dimming");
+  var dimming = await Send("get_blade_dimming", true);
   if (!dimming.startsWith("Whut?")) {
     var dim_percent = Math.round(Math.pow(parseInt(dimming) / 16384.0, 1.0/2.2) * 100);
     html += "<div class=edit id=brightness_setting><span class=title>Brightness<br><br><input type=range min=1 max=100 class=slider style='width:90%' id=brightness_input value='"+dim_percent+"' onchange='SaveBrightness()' oninput='SaveBrightness()'><br><br><span id=brightness_number>"+dim_percent+"%</span></span></div>\n";
   }
-  var threshold = await Send("get_clash_threshold");
+  var threshold = await Send("get_clash_threshold", true);
   if (!threshold.startsWith("Whut?")) {
     threshold = threshold.trim();
     html += "<div class=edit id=clash_threshold_setting><span class=title>Clash&nbsp;Threshold<br><br><input type=range min=0.5 max=6.0 step=0.05 class=slider style='width:90%' id=clash_threshold_input value='"+threshold+"' onchange='SaveClashThreshold()' oninput='SaveClashThreshold()'><br><br><span id=clash_threshold_number>"+threshold+"</span></span></div>\n";
@@ -1185,10 +1243,10 @@ async function UpdateSettings() {
   if (max_blade_length) {
     var blade = 1;
     while (true) {
-      var tmp = await Send("get_blade_length " + blade);
+      var tmp = await Send("get_blade_length " + blade, true);
       if (tmp.startsWith("Whut?")) break;
       var blade_length = parseInt(tmp);
-      max_blade_length = parseInt(await Send("get_max_blade_length " + blade));
+      max_blade_length = parseInt(await Send("get_max_blade_length " + blade, true));
       if (blade_length == -1) {
       	 blade_length = max_blade_length;
       }
@@ -1291,7 +1349,7 @@ async function Run2() {
 
   var preset;
   var preset_string;
-  preset_string = await Send("list_presets");
+  preset_string = await Send("list_presets", true);
   // if (preset_string.split("=").length > 3) break;
   const lines = preset_string.split("\n");
   for (var l = 0; l < lines.length; l++) {
@@ -1394,7 +1452,7 @@ async function DoRunLoop() {
 }
 
 async function GetList(cmd) {
-  var s = await Send(cmd);
+  var s = await Send(cmd, true);
   if (s.startsWith("Whut?")) {
     return [];
   }
@@ -1404,7 +1462,7 @@ async function GetList(cmd) {
 }
 
 async function HasCmd(cmd) {
-  var s = await Send(cmd);
+  var s = await Send(cmd, true);
   return !s.startsWith("Whut?");
 }
 
@@ -1418,21 +1476,28 @@ async function HasDir(dir) {
 
 async function Loop() {
   while (true) {
-    const preset = await Send("get_preset");
+    if (!use_tagging) {
+      // Check if we can use tagging
+      const version_string = await Send("check| version");
+      use_tagging = !version_string.startsWith("Whut?");
+      console.log("Tagging " + (use_tagging ? "on" : "off"));
+    }
+    
+    const preset = await Send("get_preset", true);
     showCurrentPreset(preset);
 
-    current_track = await Send("get_track");
+    current_track = await Send("get_track", true);
     current_track = current_track.split("\n")[0];
     showCurrentTrack(current_track);
 
-    const volume = await Send("get_volume");
+    const volume = await Send("get_volume", true);
     FIND('volume').value = parseInt(volume);
     FIND('volume_label').innerHTML = volume;
 
-    const voltage = await Send("battery_voltage");
+    const voltage = await Send("battery_voltage", true);
     FIND('voltage').innerHTML = voltage;
 
-    const on = await Send("get_on");
+    const on = await Send("get_on", true);
     if (parseInt(on)) {
       FIND('onbutton').style.background = '#505080';
       FIND('offbutton').style.background = '#101040';
@@ -1553,7 +1618,7 @@ async function Loop() {
          FIND("editbutton").style.visibility='visible';
       }
 
-      max_blade_answer = await Send("get_max_blade_length 1");
+      max_blade_answer = await Send("get_max_blade_length 1", true);
       max_blade_length = parseInt(max_blade_answer);
 
       var hasDimming = await HasCmd("get_blade_dimming");

@@ -165,15 +165,29 @@ public class SaberStateService(SaberCommandService commands)
         var maxBladeStr = await commands.Send("get_max_blade_length 1", true);
         MaxBladeLength = int.TryParse(maxBladeStr, out var ml) ? ml : 0;
 
-        // Quick capability probes only — keeps LoadInitialData fast
-        var hasDimming  = await HasCmd("get_blade_dimming");
+        // Quick capability probes — keeps dashboard refresh fast
+        var hasDimming   = await HasCmd("get_blade_dimming");
         var hasThreshold = await HasCmd("get_clash_threshold");
-        var hasGesture  = await HasCmd("get_gesture test");
-        var hasSd       = await HasCmd("sd");
+        var hasGesture   = await HasCmd("get_gesture test");
+        var hasSd        = await HasCmd("sd");
 
         HasSettings = MaxBladeLength > 0 || hasDimming || hasThreshold || hasGesture || hasSd;
 
-        Notify();
+        Notify(); // dashboard refreshes here
+
+        // Load all settings values in the background so the settings page is instant
+        _ = LoadSettingsBackgroundAsync();
+    }
+
+    private async Task LoadSettingsBackgroundAsync()
+    {
+        try
+        {
+            await LoadSettingsValuesAsync();
+            SettingsLoaded = true;
+            Notify();
+        }
+        catch { /* best-effort */ }
     }
 
     private async Task LoadNamedStyles()
@@ -373,17 +387,31 @@ public class SaberStateService(SaberCommandService commands)
     public async Task<string> GetSettingAsync(string cmd) => await commands.Send(cmd, retry: true);
     public async Task SendSettingAsync(string cmd) => await commands.Send(cmd);
 
-    /// <summary>Loads all settings values from the board. Called each time the settings page is opened.</summary>
+    /// <summary>Shows settings immediately if already loaded by startup, otherwise loads from board.</summary>
     public async Task LoadSettingsAsync()
     {
-        SettingsLoaded = false;
+        if (SettingsLoaded)
+        {
+            // Data already loaded during startup — show immediately
+            Notify();
+            return;
+        }
+
+        Notify(); // show loading bar
+
+        await LoadSettingsValuesAsync();
+        SettingsLoaded = true;
+        Notify();
+    }
+
+    private async Task LoadSettingsValuesAsync()
+    {
         HasSdToggle = false;
         HasBrightness = false;
         HasClashThreshold = false;
         BladeLengths.Clear();
         GestureBoolSettings.Clear();
         GestureIntSettings.Clear();
-        Notify();
 
         var sdStr = await GetOptional("sd");
         HasSdToggle = sdStr is not null;
@@ -427,9 +455,6 @@ public class SaberStateService(SaberCommandService commands)
             await TryLoadIntSetting ("gesture", "clashdetect", "clash detect");
             await TryLoadIntSetting ("gesture", "maxclash",    "max clash strength");
         }
-
-        SettingsLoaded = true;
-        Notify();
     }
 
     public async Task SaveSdAsync(bool val)

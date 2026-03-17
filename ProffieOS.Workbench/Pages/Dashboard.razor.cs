@@ -9,7 +9,7 @@ public partial class Dashboard : IDisposable
     {
         if (Connection.State == ConnectionState.Disconnected)
         {
-            Nav.NavigateTo("/");
+            Nav.NavigateTo("");
             return;
         }
 

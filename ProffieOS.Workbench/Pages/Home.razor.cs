@@ -16,7 +16,7 @@ public partial class Home
     {
         await Connection.InitAsync();
         if (Connection.State == ConnectionState.Connected)
-            Nav.NavigateTo("/dashboard");
+            Nav.NavigateTo("dashboard");
     }
 
     private void TogglePasswordField()
@@ -45,7 +45,7 @@ public partial class Home
         {
             await Connection.ConnectBleAsync(_password);
             await State.StartAsync();
-            Nav.NavigateTo("/dashboard");
+            Nav.NavigateTo("dashboard");
         }
         catch (Exception ex)
         {
@@ -66,7 +66,7 @@ public partial class Home
         {
             await Connection.ConnectUsbAsync();
             await State.StartAsync();
-            Nav.NavigateTo("/dashboard");
+            Nav.NavigateTo("dashboard");
         }
         catch (Exception ex)
         {
@@ -91,7 +91,7 @@ public partial class Home
                 await Connection.ConnectKnownBleAsync(device.index, _password);
 
             await State.StartAsync();
-            Nav.NavigateTo("/dashboard");
+            Nav.NavigateTo("dashboard");
         }
         catch (Exception ex)
         {

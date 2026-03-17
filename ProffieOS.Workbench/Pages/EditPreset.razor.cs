@@ -8,7 +8,7 @@ public partial class EditPreset : IDisposable
     {
         if (Connection.State == ConnectionState.Disconnected)
         {
-            Nav.NavigateTo("/");
+            Nav.NavigateTo("");
             return;
         }
 

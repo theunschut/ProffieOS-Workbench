@@ -61,37 +61,56 @@ public class SaberConnectionService(IJSRuntime js, SaberCommandService commands)
         {
             var filters = BleProfiles.Select(p => new { services = new[] { p.ServiceUuid } }).ToArray();
             ConnectedDeviceName = await js.InvokeAsync<string>("BluetoothInterop.requestDevice", filters);
-
-            var profiles = BleProfiles.Select(p => new
-            {
-                serviceUuid = p.ServiceUuid,
-                rxUuid = p.RxUuid,
-                txUuid = p.TxUuid,
-                pwUuid = p.PwUuid,
-                statusUuid = p.StatusUuid
-            }).ToArray();
-
-            await js.InvokeVoidAsync("BluetoothInterop.connect", commands.DotNetRef, profiles);
-
-            commands.SendBytesAsync = bytes => js.InvokeVoidAsync("BluetoothInterop.writeChunk", bytes).AsTask();
-            _isBle = true;
-
-            if (!string.IsNullOrEmpty(password))
-            {
-                var status = await commands.SendPasswordAndWait(password,
-                    pw => js.InvokeVoidAsync("BluetoothInterop.sendPassword", pw).AsTask());
-                if (status != "OK")
-                    throw new Exception("Wrong password");
-            }
-
-            commands.MarkConnected();
-            SetState(ConnectionState.Connected);
+            await ConnectBleInternalAsync(password);
         }
         catch
         {
             SetState(ConnectionState.Disconnected);
             throw;
         }
+    }
+
+    public async Task ConnectKnownBleAsync(int index, string? password = null)
+    {
+        SetState(ConnectionState.Connecting);
+        try
+        {
+            ConnectedDeviceName = await js.InvokeAsync<string>("BluetoothInterop.selectKnownDevice", index);
+            await ConnectBleInternalAsync(password);
+        }
+        catch
+        {
+            SetState(ConnectionState.Disconnected);
+            throw;
+        }
+    }
+
+    private async Task ConnectBleInternalAsync(string? password)
+    {
+        var profiles = BleProfiles.Select(p => new
+        {
+            serviceUuid = p.ServiceUuid,
+            rxUuid = p.RxUuid,
+            txUuid = p.TxUuid,
+            pwUuid = p.PwUuid,
+            statusUuid = p.StatusUuid
+        }).ToArray();
+
+        await js.InvokeVoidAsync("BluetoothInterop.connect", commands.DotNetRef, profiles);
+
+        commands.SendBytesAsync = bytes => js.InvokeVoidAsync("BluetoothInterop.writeChunk", bytes).AsTask();
+        _isBle = true;
+
+        if (!string.IsNullOrEmpty(password))
+        {
+            var status = await commands.SendPasswordAndWait(password,
+                pw => js.InvokeVoidAsync("BluetoothInterop.sendPassword", pw).AsTask());
+            if (status != "OK")
+                throw new Exception("Wrong password");
+        }
+
+        commands.MarkConnected();
+        SetState(ConnectionState.Connected);
     }
 
     public async Task ConnectUsbAsync()
@@ -101,19 +120,37 @@ public class SaberConnectionService(IJSRuntime js, SaberCommandService commands)
         {
             var filters = new[] { new { vendorId = 0x1209, productId = 0x6668 } };
             ConnectedDeviceName = await js.InvokeAsync<string>("UsbInterop.requestDevice", filters);
-            await js.InvokeVoidAsync("UsbInterop.connect", commands.DotNetRef);
-
-            commands.SendBytesAsync = bytes => js.InvokeVoidAsync("UsbInterop.write", bytes).AsTask();
-            _isBle = false;
-
-            commands.MarkConnected();
-            SetState(ConnectionState.Connected);
+            await ConnectUsbInternalAsync();
         }
         catch
         {
             SetState(ConnectionState.Disconnected);
             throw;
         }
+    }
+
+    public async Task ConnectKnownUsbAsync(int index)
+    {
+        SetState(ConnectionState.Connecting);
+        try
+        {
+            ConnectedDeviceName = await js.InvokeAsync<string>("UsbInterop.selectKnownDevice", index);
+            await ConnectUsbInternalAsync();
+        }
+        catch
+        {
+            SetState(ConnectionState.Disconnected);
+            throw;
+        }
+    }
+
+    private async Task ConnectUsbInternalAsync()
+    {
+        await js.InvokeVoidAsync("UsbInterop.connect", commands.DotNetRef);
+        commands.SendBytesAsync = bytes => js.InvokeVoidAsync("UsbInterop.write", bytes).AsTask();
+        _isBle = false;
+        commands.MarkConnected();
+        SetState(ConnectionState.Connected);
     }
 
     public async Task ReconnectBleAsync()

@@ -1,0 +1,46 @@
+@inject IJSRuntime JS
+
+<div class="known-devices">
+    <div class="known-devices-title">known devices</div>
+    @if (_devices.Count == 0)
+    {
+        <div class="known-devices-empty">none</div>
+    }
+    else
+    {
+        <div class="known-devices-list">
+            @foreach (var d in _devices)
+            {
+                var device = d;
+                <button class="known-device-row" disabled="@Disabled" @onclick="() => OnConnect.InvokeAsync(device)">
+                    <span class="device-type-badge @(d.type == "ble" ? "badge-ble" : "badge-usb")">
+                        @d.type
+                    </span>
+                    <span class="device-name">@d.name</span>
+                </button>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    public record KnownDeviceItem(string name, string type, int index);
+
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public EventCallback<KnownDeviceItem> OnConnect { get; set; }
+
+    private List<KnownDeviceItem> _devices = [];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        try
+        {
+            var usb = await JS.InvokeAsync<KnownDeviceItem[]>("UsbInterop.getKnownDevices");
+            var ble = await JS.InvokeAsync<KnownDeviceItem[]>("BluetoothInterop.getKnownDevices");
+            _devices = [.. usb, .. ble];
+            StateHasChanged();
+        }
+        catch { /* JS unavailable during prerender */ }
+    }
+}

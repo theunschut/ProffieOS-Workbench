@@ -46,50 +46,28 @@
         @if (State.HasEditMode)
         {
             <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                           Color="@(_mode == DashMode.Edit ? Color.Primary : Color.Default)"
                            Class="mode-btn"
                            title="Edit preset"
-                           OnClick="@(() => ToggleMode(DashMode.Edit))" />
+                           OnClick="@(() => Nav.NavigateTo("/edit"))" />
         }
         @if (State.HasSettings)
         {
             <MudIconButton Icon="@Icons.Material.Filled.Settings"
-                           Color="@(_mode == DashMode.Settings ? Color.Primary : Color.Default)"
                            Class="mode-btn"
                            title="Settings"
-                           OnClick="@(() => ToggleMode(DashMode.Settings))" />
+                           OnClick="@(() => Nav.NavigateTo("/settings"))" />
         }
     </div>
 </div>
 
 <!-- Main content -->
 <div class="dashboard-panels">
-    @if (_mode != DashMode.Settings)
-    {
-        <PresetsPanel Mode="_mode" />
-    }
-
-    @if (_mode == DashMode.Edit)
-    {
-        <EditPanel />
-    }
-
-    @if (_mode != DashMode.Settings)
-    {
-        <TracksPanel />
-        <ControlsPanel />
-    }
-
-    @if (_mode == DashMode.Settings)
-    {
-        <SettingsPanel />
-    }
+    <PresetsPanel />
+    <TracksPanel />
+    <ControlsPanel />
 </div>
 
 @code {
-    private enum DashMode { Normal, Edit, Settings }
-    private DashMode _mode = DashMode.Normal;
-
     protected override void OnInitialized()
     {
         if (Connection.State == ConnectionState.Disconnected)
@@ -108,11 +86,6 @@
 
     private void OnCommandError(string msg)
         => InvokeAsync(() => Snackbar.Add(msg, Severity.Error));
-
-    private void ToggleMode(DashMode mode)
-    {
-        _mode = _mode == mode ? DashMode.Normal : mode;
-    }
 
     private async Task OnVolumeChanged(int value)
     {

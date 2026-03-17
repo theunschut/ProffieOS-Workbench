@@ -81,6 +81,24 @@ window.BluetoothInterop = (() => {
         async sendPassword(password) {
             if (!_pw) return;
             await _pw.writeValue(new TextEncoder().encode(password));
+        },
+
+        async selectKnownDevice(index) {
+            if (!navigator.bluetooth.getDevices) throw new Error('getDevices not supported');
+            const devices = await navigator.bluetooth.getDevices();
+            if (index >= devices.length) throw new Error('Device not found');
+            _device = devices[index];
+            return _device.name ?? 'BLE Device';
+        },
+
+        async getKnownDevices() {
+            if (typeof navigator.bluetooth === 'undefined' || !navigator.bluetooth.getDevices) return [];
+            try {
+                const devices = await navigator.bluetooth.getDevices();
+                return devices.map((d, i) => ({ name: d.name || 'BLE Device', type: 'ble', index: i }));
+            } catch {
+                return [];
+            }
         }
     };
 })();

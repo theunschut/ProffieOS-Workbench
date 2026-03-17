@@ -342,6 +342,87 @@ html, body {
     background-color: #303070 !important;
 }
 
+/* ── Known devices panel (connect page) ─────────────────────── */
+.known-devices {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    max-width: 320px;
+}
+
+.known-devices-title {
+    font-family: StarJedi, sans-serif;
+    font-size: 0.9rem;
+    color: rgba(173,216,230,0.55);
+    letter-spacing: 0.05em;
+}
+
+.known-devices-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+}
+
+.known-device-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    background: #101040;
+    border: 1px solid #6060aa;
+    border-radius: 8px 24px;
+    padding: 5px 14px;
+    cursor: pointer;
+    transition: background-color 0.1s, transform 0.1s, box-shadow 0.1s;
+    text-align: left;
+}
+
+.known-device-row:hover {
+    background: #18185a;
+    box-shadow: 0 0 6px #6060aa66;
+}
+
+.known-device-row:active {
+    transform: scale(0.96);
+    box-shadow: 0 0 10px #6060aaaa;
+    background: #303080;
+}
+
+.known-device-row:disabled {
+    opacity: 0.5;
+    cursor: default;
+    pointer-events: none;
+}
+
+.device-type-badge {
+    font-family: StarJedi, sans-serif;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.badge-usb { background: #1a1a60; color: #add8e6; }
+.badge-ble { background: #1a1a60; color: #add8e6; }
+
+.known-devices-empty {
+    font-family: StarJedi, sans-serif;
+    font-size: 0.8rem;
+    color: rgba(173,216,230,0.35);
+    text-align: center;
+    padding: 4px 0;
+}
+
+.device-name {
+    font-size: 0.9rem;
+    color: #add8e6;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* ── Blazor error UI ────────────────────────────────────────── */
 #blazor-error-ui {
     background: #2a0a10;

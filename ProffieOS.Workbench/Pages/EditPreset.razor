@@ -1,0 +1,63 @@
+@page "/edit"
+@inject SaberConnectionService Connection
+@inject SaberStateService State
+@inject NavigationManager Nav
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<PageTitle>ProffieOS Workbench – Edit</PageTitle>
+
+@if (Connection.State == ConnectionState.Disconnected)
+{
+    <div class="connect-page">
+        <MudText Typo="Typo.h5" Class="starjedi-title mb-4">disconnected</MudText>
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="saber-btn"
+                   OnClick="@(() => Nav.NavigateTo("/"))">
+            reconnect
+        </MudButton>
+    </div>
+    return;
+}
+
+<!-- Header bar -->
+<div class="dashboard-header">
+    <div class="header-left">
+        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                       Class="mode-btn"
+                       title="Back to dashboard"
+                       OnClick="@(() => Nav.NavigateTo("/dashboard"))" />
+    </div>
+    <div class="header-center">
+        <span class="starjedi-title appname">Edit Preset</span>
+    </div>
+    <div class="header-right"></div>
+</div>
+
+<!-- Presets + edit panel, matching original layout -->
+<div class="dashboard-panels">
+    <PresetsPanel Mode="@("Edit")" />
+    <EditPanel />
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        if (Connection.State == ConnectionState.Disconnected)
+        {
+            Nav.NavigateTo("/");
+            return;
+        }
+
+        State.StateChanged += OnStateChanged;
+        Connection.StateChanged += OnConnectionStateChanged;
+    }
+
+    private void OnStateChanged() => InvokeAsync(StateHasChanged);
+    private void OnConnectionStateChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        State.StateChanged -= OnStateChanged;
+        Connection.StateChanged -= OnConnectionStateChanged;
+    }
+}

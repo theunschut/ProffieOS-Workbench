@@ -1,5 +1,6 @@
 @inject SaberStateService State
 @inject ISnackbar Snackbar
+@implements IDisposable
 
 <div class="panel">
     <div class="panel-header">
@@ -23,6 +24,9 @@
 </div>
 
 @code {
+    protected override void OnInitialized() => State.StateChanged += OnStateChanged;
+
+    private void OnStateChanged() => InvokeAsync(StateHasChanged);
     private async Task TurnOn()
     {
         try { await State.TurnOnAsync(); }
@@ -46,4 +50,6 @@
         try { await State.StopTrackAsync(); }
         catch (Exception ex) { Snackbar.Add(ex.Message, Severity.Error); }
     }
+
+    public void Dispose() => State.StateChanged -= OnStateChanged;
 }

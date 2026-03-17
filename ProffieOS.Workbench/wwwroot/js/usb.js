@@ -7,9 +7,10 @@ window.UsbInterop = (() => {
 
     return {
         async requestDevice(filters) {
+            const filtersArray = Array.from(filters);
             const devices = await navigator.usb.getDevices();
             _device = devices.length === 1 ? devices[0]
-                : await navigator.usb.requestDevice({ filters });
+                : await navigator.usb.requestDevice({ filters: filtersArray });
             return _device.productName ?? 'ProffieOS Device';
         },
 
@@ -77,6 +78,23 @@ window.UsbInterop = (() => {
             await _device.transferOut(_endpointOut, new Uint8Array(bytes));
         },
 
-        stop() { _reading = false; }
+        stop() { _reading = false; },
+
+        async selectKnownDevice(index) {
+            const devices = await navigator.usb.getDevices();
+            if (index >= devices.length) throw new Error('Device not found');
+            _device = devices[index];
+            return _device.productName ?? 'ProffieOS Device';
+        },
+
+        async getKnownDevices() {
+            if (typeof navigator.usb === 'undefined') return [];
+            try {
+                const devices = await navigator.usb.getDevices();
+                return devices.map((d, i) => ({ name: d.productName || 'USB Device', type: 'usb', index: i }));
+            } catch {
+                return [];
+            }
+        }
     };
 })();

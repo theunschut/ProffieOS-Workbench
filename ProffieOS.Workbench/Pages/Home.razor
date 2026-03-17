@@ -49,6 +49,8 @@
         }
     </div>
 
+    <KnownDevicesPanel Disabled="_busy" OnConnect="ConnectKnownAsync" />
+
     @if (_showPassword)
     {
         <div class="password-area">
@@ -138,6 +140,30 @@
         catch (Exception ex)
         {
             Snackbar.Add($"USB connection failed: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+            _connectingVia = "";
+        }
+    }
+
+    private async Task ConnectKnownAsync(KnownDevicesPanel.KnownDeviceItem device)
+    {
+        _busy = true;
+        _connectingVia = device.type;
+        try
+        {
+            if (device.type == "usb")
+                await Connection.ConnectKnownUsbAsync(device.index);
+            else
+                await Connection.ConnectKnownBleAsync(device.index, _password);
+            await State.StartAsync();
+            Nav.NavigateTo("/dashboard");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Connection failed: {ex.Message}", Severity.Error);
         }
         finally
         {

@@ -1,3 +1,4 @@
+using System.Globalization;
 using ProffieOS.Workbench.Models;
 
 namespace ProffieOS.Workbench.Services;
@@ -22,7 +23,19 @@ public class SaberStateService(SaberCommandService commands)
 
     public bool HasEditMode { get; private set; }
     public bool HasSettings { get; private set; }
+    public bool SettingsLoaded { get; private set; }
     public int MaxBladeLength { get; private set; }
+
+    // ── Settings state (loaded lazily via LoadSettingsAsync) ──────────────────
+    public bool HasSdToggle { get; private set; }
+    public bool SdEnabled { get; private set; }
+    public bool HasBrightness { get; private set; }
+    public int Brightness { get; private set; } = 100;
+    public bool HasClashThreshold { get; private set; }
+    public float ClashThreshold { get; private set; } = 1.0f;
+    public List<int> BladeLengths { get; } = [];
+    public List<BoolSettingItem> GestureBoolSettings { get; } = [];
+    public List<IntSettingItem> GestureIntSettings { get; } = [];
 
     public event Action? StateChanged;
 
@@ -37,6 +50,13 @@ public class SaberStateService(SaberCommandService commands)
         TrackList.Clear();
         FontList.Clear();
         NamedStyles.Clear();
+        BladeLengths.Clear();
+        GestureBoolSettings.Clear();
+        GestureIntSettings.Clear();
+        HasSdToggle = false;
+        HasBrightness = false;
+        HasClashThreshold = false;
+        SettingsLoaded = false;
 
         await Sync();
         await LoadPresets();
@@ -145,10 +165,11 @@ public class SaberStateService(SaberCommandService commands)
         var maxBladeStr = await commands.Send("get_max_blade_length 1", true);
         MaxBladeLength = int.TryParse(maxBladeStr, out var ml) ? ml : 0;
 
-        var hasDimming = await HasCmd("get_blade_dimming");
+        // Quick capability probes only — keeps LoadInitialData fast
+        var hasDimming  = await HasCmd("get_blade_dimming");
         var hasThreshold = await HasCmd("get_clash_threshold");
-        var hasGesture = await HasCmd("get_gesture test");
-        var hasSd = await HasCmd("sd");
+        var hasGesture  = await HasCmd("get_gesture test");
+        var hasSd       = await HasCmd("sd");
 
         HasSettings = MaxBladeLength > 0 || hasDimming || hasThreshold || hasGesture || hasSd;
 
@@ -352,16 +373,105 @@ public class SaberStateService(SaberCommandService commands)
     public async Task<string> GetSettingAsync(string cmd) => await commands.Send(cmd, retry: true);
     public async Task SendSettingAsync(string cmd) => await commands.Send(cmd);
 
+    /// <summary>Loads all settings values from the board. Called each time the settings page is opened.</summary>
+    public async Task LoadSettingsAsync()
+    {
+        SettingsLoaded = false;
+        HasSdToggle = false;
+        HasBrightness = false;
+        HasClashThreshold = false;
+        BladeLengths.Clear();
+        GestureBoolSettings.Clear();
+        GestureIntSettings.Clear();
+        Notify();
+
+        var sdStr = await GetOptional("sd");
+        HasSdToggle = sdStr is not null;
+        if (HasSdToggle) SdEnabled = float.TryParse(sdStr, NumberStyles.Float, CultureInfo.InvariantCulture, out var sv) && sv > 0.5f;
+
+        var dimStr = await GetOptional("get_blade_dimming");
+        HasBrightness = dimStr is not null;
+        if (HasBrightness && int.TryParse(dimStr!.Trim(), out var dim))
+            Brightness = (int)Math.Round(Math.Pow(dim / 16384.0, 1.0 / 2.2) * 100);
+
+        var threshStr = await GetOptional("get_clash_threshold");
+        HasClashThreshold = threshStr is not null;
+        if (HasClashThreshold && float.TryParse(threshStr!.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out var thresh))
+            ClashThreshold = thresh;
+
+        if (MaxBladeLength > 0)
+        {
+            for (var blade = 1; ; blade++)
+            {
+                var lenStr = await GetOptional($"get_blade_length {blade}");
+                if (lenStr is null) break;
+                if (!int.TryParse(lenStr.Trim(), out var len) || len == 0) break;
+                if (len == -1) len = MaxBladeLength;
+                BladeLengths.Add(len);
+            }
+        }
+
+        if (await GetOptional("get_gesture test") is not null)
+        {
+            await TryLoadBoolSetting("gesture", "gestureon",   "gesture ignition");
+            await TryLoadBoolSetting("gesture", "swingon",     "swing ignition");
+            await TryLoadBoolSetting("gesture", "twiston",     "twist ignition");
+            await TryLoadBoolSetting("gesture", "thruston",    "thrust ignition");
+            await TryLoadBoolSetting("gesture", "stabon",      "stab ignition");
+            await TryLoadBoolSetting("gesture", "twistoff",    "twist off");
+            await TryLoadBoolSetting("gesture", "powerlock",   "power lock");
+            await TryLoadBoolSetting("gesture", "forcepush",   "force push");
+            await TryLoadIntSetting ("gesture", "swingonspeed","swing on speed");
+            await TryLoadIntSetting ("gesture", "forcepushlen","force push length");
+            await TryLoadIntSetting ("gesture", "lockupdelay", "lockup delay");
+            await TryLoadIntSetting ("gesture", "clashdetect", "clash detect");
+            await TryLoadIntSetting ("gesture", "maxclash",    "max clash strength");
+        }
+
+        SettingsLoaded = true;
+        Notify();
+    }
+
+    public async Task SaveSdAsync(bool val)
+    {
+        SdEnabled = val;
+        await commands.Send($"sd {(val ? "1" : "0")}");
+    }
+
     public async Task SaveBrightnessAsync(int percent)
     {
+        Brightness = percent;
         var raw = (int)Math.Round(Math.Pow(percent / 100.0, 2.2) * 16384);
         await commands.Send($"set_blade_dimming {raw}");
     }
 
-    public async Task SaveBladeLengthAsync(int blade, int length, int maxLength)
+    public async Task SaveClashThresholdAsync(float val)
     {
-        length = Math.Min(length, maxLength);
+        ClashThreshold = val;
+        await commands.Send($"set_clash_threshold {val.ToString(CultureInfo.InvariantCulture)}");
+    }
+
+    public async Task SaveBladeLengthAsync(int blade, int length)
+    {
+        length = Math.Min(length, MaxBladeLength);
+        if (blade - 1 < BladeLengths.Count) BladeLengths[blade - 1] = length;
         await commands.Send($"set_blade_length {blade} {length}");
+    }
+
+    public async Task SaveBoolGestureAsync(int idx, bool val)
+    {
+        if (idx < 0 || idx >= GestureBoolSettings.Count) return;
+        var s = GestureBoolSettings[idx];
+        GestureBoolSettings[idx] = s with { Value = val };
+        await commands.Send($"set_{s.BaseCmd} {s.Variable} {(val ? "1" : "0")}");
+    }
+
+    public async Task SaveIntGestureAsync(int idx, int val)
+    {
+        if (idx < 0 || idx >= GestureIntSettings.Count) return;
+        var s = GestureIntSettings[idx];
+        GestureIntSettings[idx] = s with { Value = val };
+        await commands.Send($"set_{s.BaseCmd} {s.Variable} {val}");
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
@@ -378,13 +488,36 @@ public class SaberStateService(SaberCommandService commands)
     private async Task<bool> HasCmd(string cmd)
     {
         var s = await commands.Send(cmd, retry: true);
-        return !s.StartsWith("Whut?");
+        return !string.IsNullOrWhiteSpace(s) && !s.StartsWith("Whut?");
     }
 
     private async Task<bool> HasDir(string dir)
     {
         var entries = await GetList($"dir {dir}");
         return !(entries.Count == 1 && entries[0] == "No such directory.");
+    }
+
+    /// <summary>Returns trimmed value, or null if the command is unsupported or returned empty.</summary>
+    private async Task<string?> GetOptional(string cmd)
+    {
+        var s = await commands.Send(cmd, retry: true);
+        return s.StartsWith("Whut?") || string.IsNullOrWhiteSpace(s) ? null : s.Trim();
+    }
+
+    private async Task TryLoadBoolSetting(string baseCmd, string variable, string label)
+    {
+        var val = await GetOptional($"get_{baseCmd} {variable}");
+        if (val is null) return;
+        GestureBoolSettings.Add(new BoolSettingItem(baseCmd, variable, label,
+            float.TryParse(val, NumberStyles.Float, CultureInfo.InvariantCulture, out var f) && f > 0.5f));
+    }
+
+    private async Task TryLoadIntSetting(string baseCmd, string variable, string label)
+    {
+        var val = await GetOptional($"get_{baseCmd} {variable}");
+        if (val is null) return;
+        GestureIntSettings.Add(new IntSettingItem(baseCmd, variable, label,
+            int.TryParse(val, out var i) ? i : 0));
     }
 
     private void Notify() => StateChanged?.Invoke();

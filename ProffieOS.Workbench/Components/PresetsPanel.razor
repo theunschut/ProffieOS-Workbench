@@ -1,5 +1,6 @@
 @inject SaberStateService State
 @inject ISnackbar Snackbar
+@implements IDisposable
 
 <div class="panel">
     <div class="panel-header">
@@ -47,6 +48,10 @@
 
 @code {
     [Parameter] public object Mode { get; set; } = "Normal";
+
+    protected override void OnInitialized() => State.StateChanged += OnStateChanged;
+
+    private void OnStateChanged() => InvokeAsync(StateHasChanged);
 
     private bool IsEditMode => Mode?.ToString() == "Edit";
 
@@ -109,4 +114,6 @@
         try { await State.DeletePresetAsync(index); }
         catch (Exception ex) { Snackbar.Add($"Delete failed: {ex.Message}", Severity.Error); }
     }
+
+    public void Dispose() => State.StateChanged -= OnStateChanged;
 }

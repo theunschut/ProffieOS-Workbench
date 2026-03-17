@@ -12,7 +12,7 @@
     <div class="connect-page">
         <MudText Typo="Typo.h5" Class="starjedi-title mb-4">disconnected</MudText>
         <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="saber-btn"
-                   OnClick="@(() => Nav.NavigateTo("/"))">
+                   OnClick="@(() => Nav.NavigateTo(""))">
             reconnect
         </MudButton>
     </div>
@@ -47,14 +47,14 @@
             <MudIconButton Icon="@Icons.Material.Filled.Edit"
                            Class="mode-btn"
                            title="Edit preset"
-                           OnClick="@(() => Nav.NavigateTo("/edit"))" />
+                           OnClick="@(() => Nav.NavigateTo("edit"))" />
         }
         @if (State.HasSettings)
         {
             <MudIconButton Icon="@Icons.Material.Filled.Settings"
                            Class="mode-btn"
                            title="Settings"
-                           OnClick="@(() => Nav.NavigateTo("/settings"))" />
+                           OnClick="@(() => Nav.NavigateTo("settings"))" />
         }
     </div>
 </div>

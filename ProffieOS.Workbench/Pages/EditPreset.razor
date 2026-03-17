@@ -11,7 +11,7 @@
     <div class="connect-page">
         <MudText Typo="Typo.h5" Class="starjedi-title mb-4">disconnected</MudText>
         <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="saber-btn"
-                   OnClick="@(() => Nav.NavigateTo("/"))">
+                   OnClick="@(() => Nav.NavigateTo(""))">
             reconnect
         </MudButton>
     </div>
@@ -24,7 +24,7 @@
         <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
                        Class="mode-btn"
                        title="Back to dashboard"
-                       OnClick="@(() => Nav.NavigateTo("/dashboard"))" />
+                       OnClick="@(() => Nav.NavigateTo("dashboard"))" />
     </div>
     <div class="header-center">
         <span class="starjedi-title appname">Edit Preset</span>

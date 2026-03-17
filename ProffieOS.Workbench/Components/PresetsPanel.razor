@@ -1,0 +1,112 @@
+@inject SaberStateService State
+@inject ISnackbar Snackbar
+
+<div class="panel">
+    <div class="panel-header">
+        <span class="starjedi-title panel-title">Presets</span>
+    </div>
+    <div class="panel-scroll">
+        <div class="card-grid">
+            @for (var i = 0; i < State.Presets.Count; i++)
+            {
+                var idx = i;
+                var preset = State.Presets[i];
+                var isActive = idx == State.CurrentPresetIndex;
+
+                <MudPaper Class="@($"saber-card preset-card{(isActive ? " active" : "")}")"
+                          Elevation="0"
+                          draggable="@(IsEditMode ? "true" : "false")"
+                          @ondragstart="@(_ => StartDrag(idx))"
+                          @ondrop="@(_ => Drop(idx))"
+                          @ondragover:preventDefault="true"
+                          @onclick="@(_ => SelectPreset(idx))"
+                          @ondblclick="@(_ => { if (IsEditMode) EditPreset(idx); })">
+                    <span class="starjedi-title card-title">@preset.Name.Replace("\\n", "\n")</span>
+                </MudPaper>
+            }
+
+            @if (IsEditMode)
+            {
+                <MudPaper Class="saber-card preset-card action-card"
+                          Elevation="0"
+                          @onclick="AddPreset">
+                    <span class="card-symbol">+</span>
+                </MudPaper>
+
+                <MudPaper Class="saber-card preset-card action-card danger-card"
+                          Elevation="0"
+                          @ondrop="DropDelete"
+                          @ondragover:preventDefault="true"
+                          @onclick="ConfirmDelete">
+                    <span class="card-symbol">🗑</span>
+                </MudPaper>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public object Mode { get; set; } = "Normal";
+
+    private bool IsEditMode => Mode?.ToString() == "Edit";
+
+    private int _dragging = -1;
+
+    private async Task SelectPreset(int index)
+    {
+        try { await State.SetPresetAsync(index); }
+        catch (Exception ex) { Snackbar.Add($"Failed to set preset: {ex.Message}", Severity.Error); }
+    }
+
+    private void StartDrag(int index) => _dragging = index;
+
+    private async Task Drop(int index)
+    {
+        if (_dragging < 0 || _dragging == index) return;
+        try
+        {
+            await State.MovePresetAsync(_dragging, index);
+            _dragging = -1;
+        }
+        catch (Exception ex) { Snackbar.Add($"Move failed: {ex.Message}", Severity.Error); }
+    }
+
+    private async Task DropDelete()
+    {
+        if (_dragging < 0) return;
+        await DoDelete(_dragging);
+        _dragging = -1;
+    }
+
+    private void EditPreset(int index) { /* edit panel listens to CurrentPresetIndex */ }
+
+    private async Task AddPreset()
+    {
+        try { await State.AddPresetAsync(); }
+        catch (Exception ex) { Snackbar.Add($"Failed to add preset: {ex.Message}", Severity.Error); }
+    }
+
+    private bool _confirmDelete;
+
+    private async Task ConfirmDelete()
+    {
+        if (!_confirmDelete)
+        {
+            _confirmDelete = true;
+            Snackbar.Add("Click trash again to confirm deletion", Severity.Warning);
+            await Task.Delay(3000);
+            _confirmDelete = false;
+        }
+        else
+        {
+            _confirmDelete = false;
+            await DoDelete(State.CurrentPresetIndex);
+        }
+    }
+
+    private async Task DoDelete(int index)
+    {
+        try { await State.DeletePresetAsync(index); }
+        catch (Exception ex) { Snackbar.Add($"Delete failed: {ex.Message}", Severity.Error); }
+    }
+}

@@ -1,0 +1,252 @@
+@inject SaberStateService State
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<div class="panel settings-panel">
+    <div class="panel-header">
+        <span class="starjedi-title panel-title">Settings</span>
+    </div>
+    <div class="panel-scroll">
+        @if (_loading)
+        {
+            <div class="pa-4">
+                <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+            </div>
+        }
+        else
+        {
+            <div class="edit-fields">
+
+                @if (_hasSd)
+                {
+                    <MudPaper Class="saber-card edit-card" Elevation="0">
+                        <div class="setting-row">
+                            <MudText Class="starjedi-title setting-label">sd card access</MudText>
+                            <MudSwitch T="bool" Value="_sdAccess"
+                                       Color="Color.Primary"
+                                       ValueChanged="SaveSd" />
+                        </div>
+                    </MudPaper>
+                }
+
+                @if (_hasBrightness)
+                {
+                    <MudPaper Class="saber-card edit-card" Elevation="0">
+                        <MudText Typo="Typo.caption" Class="field-label starjedi-title">
+                            brightness: @_brightness%
+                        </MudText>
+                        <MudSlider T="int" Value="_brightness"
+                                   Min="1" Max="100"
+                                   Class="variation-slider"
+                                   ValueChanged="SaveBrightness" />
+                    </MudPaper>
+                }
+
+                @if (_hasClashThreshold)
+                {
+                    <MudPaper Class="saber-card edit-card" Elevation="0">
+                        <MudText Typo="Typo.caption" Class="field-label starjedi-title">
+                            clash threshold: @_clashThreshold.ToString("F2")
+                        </MudText>
+                        <MudSlider T="float" Value="_clashThreshold"
+                                   Min="0.5f" Max="6.0f" Step="0.05f"
+                                   Class="variation-slider"
+                                   ValueChanged="SaveClashThreshold" />
+                    </MudPaper>
+                }
+
+                @for (var b = 1; b <= _bladeLengths.Count; b++)
+                {
+                    var blade = b;
+                    <MudPaper Class="saber-card edit-card" Elevation="0">
+                        <MudText Typo="Typo.caption" Class="field-label starjedi-title">
+                            blade @blade length
+                        </MudText>
+                        <MudNumericField T="int"
+                                         @bind-Value="_bladeLengths[blade - 1]"
+                                         Min="0" Max="@_maxBladeLength"
+                                         Variant="Variant.Outlined"
+                                         Class="saber-input"
+                                         OnBlur="@(() => SaveBladeLength(blade))" />
+                    </MudPaper>
+                }
+
+                @foreach (var setting in _boolSettings)
+                {
+                    var s = setting;
+                    <MudPaper Class="saber-card edit-card" Elevation="0">
+                        <div class="setting-row">
+                            <MudText Class="starjedi-title setting-label">@s.Label</MudText>
+                            <MudSwitch T="bool" Value="@s.Value"
+                                       Color="Color.Primary"
+                                       ValueChanged="@(v => SaveBoolSetting(s, v))" />
+                        </div>
+                    </MudPaper>
+                }
+
+                @foreach (var setting in _intSettings)
+                {
+                    var s = setting;
+                    <MudPaper Class="saber-card edit-card" Elevation="0">
+                        <MudText Typo="Typo.caption" Class="field-label starjedi-title">@s.Label</MudText>
+                        <MudNumericField T="int" Value="s.Value"
+                                         Variant="Variant.Outlined"
+                                         Class="saber-input"
+                                         ValueChanged="@(v => SaveIntSetting(s, v))" />
+                    </MudPaper>
+                }
+
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private bool _loading = true;
+    private bool _hasSd, _sdAccess;
+    private bool _hasBrightness;
+    private int _brightness = 100;
+    private bool _hasClashThreshold;
+    private float _clashThreshold = 1.0f;
+    private List<int> _bladeLengths = [];
+    private int _maxBladeLength;
+
+    private record BoolSetting(string BaseCmd, string Variable, string Label, bool Value);
+    private record IntSetting(string BaseCmd, string Variable, string Label, int Value);
+
+    private List<BoolSetting> _boolSettings = [];
+    private List<IntSetting> _intSettings = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSettings();
+    }
+
+    private async Task LoadSettings()
+    {
+        _loading = true;
+        StateHasChanged();
+
+        try
+        {
+            // SD card toggle
+            var sdStr = await State.GetSettingAsync("sd");
+            _hasSd = !sdStr.StartsWith("Whut?") && !string.IsNullOrWhiteSpace(sdStr);
+            if (_hasSd) _sdAccess = float.TryParse(sdStr, out var sdVal) && sdVal > 0.5f;
+
+            // Brightness
+            var dimStr = await State.GetSettingAsync("get_blade_dimming");
+            _hasBrightness = !dimStr.StartsWith("Whut?");
+            if (_hasBrightness && int.TryParse(dimStr.Trim(), out var dim))
+                _brightness = (int)Math.Round(Math.Pow(dim / 16384.0, 1.0 / 2.2) * 100);
+
+            // Clash threshold
+            var threshStr = await State.GetSettingAsync("get_clash_threshold");
+            _hasClashThreshold = !threshStr.StartsWith("Whut?");
+            if (_hasClashThreshold && float.TryParse(threshStr.Trim(),
+                    System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture, out var thresh))
+                _clashThreshold = thresh;
+
+            // Blade lengths
+            _maxBladeLength = State.MaxBladeLength;
+            if (_maxBladeLength > 0)
+            {
+                for (var blade = 1; ; blade++)
+                {
+                    var lenStr = await State.GetSettingAsync($"get_blade_length {blade}");
+                    if (lenStr.StartsWith("Whut?")) break;
+                    if (!int.TryParse(lenStr.Trim(), out var len) || len == 0) break;
+                    if (len == -1) len = _maxBladeLength;
+                    _bladeLengths.Add(len);
+                }
+            }
+
+            // Gesture boolean settings
+            await TryAddBool("gesture", "gestureon",    "gesture ignition");
+            await TryAddBool("gesture", "swingon",      "swing ignition");
+            await TryAddBool("gesture", "twiston",      "twist ignition");
+            await TryAddBool("gesture", "thruston",     "thrust ignition");
+            await TryAddBool("gesture", "stabon",       "stab ignition");
+            await TryAddBool("gesture", "twistoff",     "twist off");
+            await TryAddBool("gesture", "powerlock",    "power lock");
+            await TryAddBool("gesture", "forcepush",    "force push");
+
+            // Gesture int settings
+            await TryAddInt("gesture", "swingonspeed",  "swing on speed");
+            await TryAddInt("gesture", "forcepushlen",  "force push length");
+            await TryAddInt("gesture", "lockupdelay",   "lockup delay");
+            await TryAddInt("gesture", "clashdetect",   "clash detect");
+            await TryAddInt("gesture", "maxclash",      "max clash strength");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Settings load error: {ex.Message}", Severity.Warning);
+        }
+
+        _loading = false;
+        StateHasChanged();
+    }
+
+    private async Task TryAddBool(string baseCmd, string variable, string label)
+    {
+        var val = await State.GetSettingAsync($"get_{baseCmd} {variable}");
+        if (val.StartsWith("Whut?") || string.IsNullOrWhiteSpace(val)) return;
+        _boolSettings.Add(new BoolSetting(baseCmd, variable, label,
+            float.TryParse(val, out var f) && f > 0.5f));
+    }
+
+    private async Task TryAddInt(string baseCmd, string variable, string label)
+    {
+        var val = await State.GetSettingAsync($"get_{baseCmd} {variable}");
+        if (val.StartsWith("Whut?") || string.IsNullOrWhiteSpace(val)) return;
+        _intSettings.Add(new IntSetting(baseCmd, variable, label,
+            int.TryParse(val.Trim(), out var i) ? i : 0));
+    }
+
+    private async Task SaveSd(bool val)
+    {
+        _sdAccess = val;
+        try { await State.SendSettingAsync($"sd {(val ? "1" : "0")}"); }
+        catch (Exception ex) { Snackbar.Add(ex.Message, Severity.Error); }
+    }
+
+    private async Task SaveBrightness(int percent)
+    {
+        _brightness = percent;
+        try { await State.SaveBrightnessAsync(percent); }
+        catch (Exception ex) { Snackbar.Add(ex.Message, Severity.Error); }
+    }
+
+    private async Task SaveClashThreshold(float val)
+    {
+        _clashThreshold = val;
+        try { await State.SendSettingAsync($"set_clash_threshold {val.ToString(System.Globalization.CultureInfo.InvariantCulture)}"); }
+        catch (Exception ex) { Snackbar.Add(ex.Message, Severity.Error); }
+    }
+
+    private async Task SaveBladeLength(int blade)
+    {
+        if (blade - 1 >= _bladeLengths.Count) return;
+        try { await State.SaveBladeLengthAsync(blade, _bladeLengths[blade - 1], _maxBladeLength); }
+        catch (Exception ex) { Snackbar.Add(ex.Message, Severity.Error); }
+    }
+
+    private async Task SaveBoolSetting(BoolSetting s, bool val)
+    {
+        var idx = _boolSettings.IndexOf(s);
+        if (idx >= 0) _boolSettings[idx] = s with { Value = val };
+        try { await State.SendSettingAsync($"set_{s.BaseCmd} {s.Variable} {(val ? "1" : "0")}"); }
+        catch (Exception ex) { Snackbar.Add(ex.Message, Severity.Error); }
+    }
+
+    private async Task SaveIntSetting(IntSetting s, int val)
+    {
+        var idx = _intSettings.IndexOf(s);
+        if (idx >= 0) _intSettings[idx] = s with { Value = val };
+        try { await State.SendSettingAsync($"set_{s.BaseCmd} {s.Variable} {val}"); }
+        catch (Exception ex) { Snackbar.Add(ex.Message, Severity.Error); }
+    }
+
+    public void Dispose() { }
+}

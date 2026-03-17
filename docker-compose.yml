@@ -1,0 +1,12 @@
+services:
+  proffie-workbench:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    environment:
+      # Set BASE_PATH if serving from a sub-path, e.g. "/ProffieOS-Workbench/"
+      # Leave as "/" for root deployment.
+      BASE_PATH: /
+    restart: unless-stopped

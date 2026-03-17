@@ -1,0 +1,47 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Inject base href for GitHub Pages
+        # Replaces the default <base href="/" /> with the repo-specific path.
+        # For forks: the repo name is detected automatically from GITHUB_REPOSITORY.
+        run: |
+          REPO_NAME=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f2)
+          sed -i "s|<base href=\"/\" />|<base href=\"/${REPO_NAME}/\" />|g" \
+            workbench/ProffieOS.Workbench/wwwroot/index.html
+
+      - name: Publish Blazor WASM
+        run: |
+          dotnet publish workbench/ProffieOS.Workbench/ProffieOS.Workbench.csproj \
+            -c Release \
+            -o publish
+
+      - name: Add GitHub Pages SPA redirect
+        # Blazor WASM uses client-side routing; GitHub Pages needs a 404.html trick.
+        run: |
+          cp publish/wwwroot/index.html publish/wwwroot/404.html
+
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: publish/wwwroot
+          force_orphan: true

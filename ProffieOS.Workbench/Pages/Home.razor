@@ -1,0 +1,148 @@
+@page "/"
+@inject SaberConnectionService Connection
+@inject SaberStateService State
+@inject NavigationManager Nav
+@inject ISnackbar Snackbar
+
+<PageTitle>ProffieOS Workbench</PageTitle>
+
+<div class="connect-page">
+    <div class="connect-logo">
+        <span class="starjedi-title">ProffieOS<br />Workbench</span>
+    </div>
+
+    @if (!Connection.BluetoothAvailable && !Connection.UsbAvailable)
+    {
+        <MudAlert Severity="Severity.Error" Class="mt-4" Style="max-width:400px;">
+            This browser supports neither Web Bluetooth nor WebUSB.
+            Use a Chromium-based browser (Chrome, Edge).
+        </MudAlert>
+    }
+
+    <div class="connect-buttons">
+        @if (Connection.UsbAvailable)
+        {
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       Size="Size.Large"
+                       Class="saber-btn connect-btn"
+                       Disabled="_busy"
+                       OnClick="ConnectUsbAsync">
+                @if (_busy && _connectingVia == "usb")
+                {
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                }
+                usb
+            </MudButton>
+        }
+
+        @if (Connection.BluetoothAvailable)
+        {
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       Size="Size.Large"
+                       Class="saber-btn connect-btn"
+                       Disabled="_busy"
+                       OnClick="TogglePasswordField">
+                ble
+            </MudButton>
+        }
+    </div>
+
+    @if (_showPassword)
+    {
+        <div class="password-area">
+            <MudTextField @bind-Value="_password"
+                          Label="Password (optional)"
+                          InputType="InputType.Password"
+                          Variant="Variant.Outlined"
+                          Class="password-field"
+                          OnKeyDown="OnPasswordKeyDown" />
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       Class="saber-btn"
+                       Disabled="_busy"
+                       OnClick="ConnectBleAsync">
+                @if (_busy && _connectingVia == "ble")
+                {
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                }
+                connect
+            </MudButton>
+        </div>
+    }
+</div>
+
+@code {
+    private bool _busy;
+    private bool _showPassword;
+    private string _password = "";
+    private string _connectingVia = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Connection.InitAsync();
+        // If we navigated back here while still connected, go to dashboard
+        if (Connection.State == ConnectionState.Connected)
+            Nav.NavigateTo("/dashboard");
+    }
+
+    private void TogglePasswordField()
+    {
+        if (!_showPassword)
+        {
+            _showPassword = true;
+        }
+        else
+        {
+            _ = ConnectBleAsync();
+        }
+    }
+
+    private async Task OnPasswordKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") await ConnectBleAsync();
+    }
+
+    private async Task ConnectBleAsync()
+    {
+        _busy = true;
+        _connectingVia = "ble";
+        try
+        {
+            await Connection.ConnectBleAsync(_password);
+            await State.StartAsync();
+            Nav.NavigateTo("/dashboard");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"BLE connection failed: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+            _connectingVia = "";
+        }
+    }
+
+    private async Task ConnectUsbAsync()
+    {
+        _busy = true;
+        _connectingVia = "usb";
+        try
+        {
+            await Connection.ConnectUsbAsync();
+            await State.StartAsync();
+            Nav.NavigateTo("/dashboard");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"USB connection failed: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+            _connectingVia = "";
+        }
+    }
+}

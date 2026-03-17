@@ -74,6 +74,12 @@ public partial class StyleEditor
         _ = SaveStyle();
     }
 
+    private string GetArgLabel(StyleArgument arg, int index)
+    {
+        if (!string.IsNullOrWhiteSpace(arg.Description)) return arg.Description;
+        return arg.Type == "COLOR" ? $"color {index + 1}" : $"value {index + 1}";
+    }
+
     private async Task SaveStyle()
     {
         if (_namedStyle is null) return;

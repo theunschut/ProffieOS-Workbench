@@ -256,6 +256,7 @@ html, body {
     gap: 12px;
     justify-content: stretch;
     align-content: start;
+    align-items: start;
 }
 
 .settings-grid .edit-card {
@@ -270,7 +271,22 @@ html, body {
     justify-self: stretch;
 }
 
-.edit-grid .style-card {
+.style-editors-section {
+    grid-column: 1 / -1;
+}
+
+.style-section-title {
+    margin: 0 0 8px 4px;
+}
+
+.style-editors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 12px;
+    align-items: start;
+}
+
+.style-editors-grid .style-card {
     min-width: 0 !important;
 }
 
@@ -327,7 +343,9 @@ html, body {
     word-break: break-word;
 }
 
-.arg-input { flex: 1; }
+.arg-input {
+    flex: 1;
+}
 
 .color-picker {
     border: 1px solid #6060aa;

@@ -23,7 +23,7 @@
             var idx = i;
 
             <div class="arg-row">
-                <MudText Typo="Typo.caption" Class="arg-label">@arg.Description</MudText>
+                <MudText Typo="Typo.caption" Class="arg-label">@GetArgLabel(arg, idx)</MudText>
 
                 @if (arg.Type == "COLOR")
                 {

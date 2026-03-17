@@ -53,11 +53,15 @@
                 </MudSelect>
             </MudPaper>
 
-            <!-- Blade styles -->
-            @foreach (var (blade, style) in _preset.Styles)
-            {
-                <StyleEditor Blade="blade" StyleValue="style" PresetIndex="State.CurrentPresetIndex" />
-            }
+            <div class="style-editors-section">
+                <MudText Typo="Typo.caption" Class="field-label starjedi-title style-section-title">blade styles</MudText>
+                <div class="style-editors-grid">
+                    @foreach (var (blade, style) in _preset.Styles)
+                    {
+                        <StyleEditor Blade="blade" StyleValue="@style" PresetIndex="State.CurrentPresetIndex" />
+                    }
+                </div>
+            </div>
 
             <!-- Variation -->
             <VariationEditor PresetIndex="State.CurrentPresetIndex" />

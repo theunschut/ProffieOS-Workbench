@@ -195,6 +195,14 @@ html, body {
     flex: 0 0 340px;
 }
 
+.edit-layout .presets-panel {
+    flex: 0 0 33.333%;
+}
+
+.edit-layout .edit-panel {
+    flex: 0 0 66.667%;
+}
+
 .panel-header {
     flex-shrink: 0;
     padding: 6px 8px;
@@ -232,6 +240,38 @@ html, body {
     flex-direction: column;
     gap: 6px;
     padding: 4px;
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
+    gap: 12px;
+    justify-content: center;
+    align-content: start;
+}
+
+.edit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 12px;
+    justify-content: stretch;
+    align-content: start;
+}
+
+.settings-grid .edit-card {
+    width: 320px;
+    max-width: 100%;
+    justify-self: center;
+}
+
+.edit-grid .edit-card {
+    width: 100%;
+    max-width: none;
+    justify-self: stretch;
+}
+
+.edit-grid .style-card {
+    min-width: 0 !important;
 }
 
 .edit-card {

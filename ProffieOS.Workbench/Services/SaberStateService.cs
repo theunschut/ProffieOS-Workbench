@@ -74,7 +74,6 @@ public class SaberStateService(SaberCommandService commands)
 
     private async Task Sync()
     {
-        // Flush until we get a known response, matching the original SYNC()
         var x = 42;
         while (true)
         {
@@ -442,8 +441,6 @@ public class SaberStateService(SaberCommandService commands)
 
                 if (len == -1)
                 {
-                    // Match original app behavior: if per-blade max is not available,
-                    // treat this as end-of-valid-blades.
                     if (bladeMax <= 0) break;
                     len = bladeMax;
                 }
@@ -535,7 +532,6 @@ public class SaberStateService(SaberCommandService commands)
     /// <summary>Returns trimmed value, or null if the command is unsupported or returned empty.</summary>
     private async Task<string?> GetOptional(string cmd)
     {
-        // Match original app behavior: probe settings with retries and wait for the response.
         var s = await commands.Send(cmd, retry: true);
         return s.StartsWith("Whut?") || string.IsNullOrWhiteSpace(s) ? null : s.Trim();
     }

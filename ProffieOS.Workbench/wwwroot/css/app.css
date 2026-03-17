@@ -286,6 +286,12 @@ html, body {
     align-items: start;
 }
 
+.style-editors-grid .edit-card {
+    width: 100%;
+    max-width: none;
+    justify-self: stretch;
+}
+
 .style-editors-grid .style-card {
     min-width: 0 !important;
 }

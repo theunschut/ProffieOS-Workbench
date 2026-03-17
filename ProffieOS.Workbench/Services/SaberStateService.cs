@@ -434,27 +434,37 @@ public class SaberStateService(SaberCommandService commands)
                 var lenStr = await GetOptional($"get_blade_length {blade}");
                 if (lenStr is null) break;
                 if (!int.TryParse(lenStr.Trim(), out var len) || len == 0) break;
-                if (len == -1) len = MaxBladeLength;
+
+                var bladeMax = 0;
+                var bladeMaxStr = await GetOptional($"get_max_blade_length {blade}");
+                if (bladeMaxStr is not null)
+                    int.TryParse(bladeMaxStr.Trim(), out bladeMax);
+
+                if (len == -1)
+                {
+                    // Match original app behavior: if per-blade max is not available,
+                    // treat this as end-of-valid-blades.
+                    if (bladeMax <= 0) break;
+                    len = bladeMax;
+                }
+
                 BladeLengths.Add(len);
             }
         }
 
-        if (await GetOptional("get_gesture test") is not null)
-        {
-            await TryLoadBoolSetting("gesture", "gestureon",   "gesture ignition");
-            await TryLoadBoolSetting("gesture", "swingon",     "swing ignition");
-            await TryLoadBoolSetting("gesture", "twiston",     "twist ignition");
-            await TryLoadBoolSetting("gesture", "thruston",    "thrust ignition");
-            await TryLoadBoolSetting("gesture", "stabon",      "stab ignition");
-            await TryLoadBoolSetting("gesture", "twistoff",    "twist off");
-            await TryLoadBoolSetting("gesture", "powerlock",   "power lock");
-            await TryLoadBoolSetting("gesture", "forcepush",   "force push");
-            await TryLoadIntSetting ("gesture", "swingonspeed","swing on speed");
-            await TryLoadIntSetting ("gesture", "forcepushlen","force push length");
-            await TryLoadIntSetting ("gesture", "lockupdelay", "lockup delay");
-            await TryLoadIntSetting ("gesture", "clashdetect", "clash detect");
-            await TryLoadIntSetting ("gesture", "maxclash",    "max clash strength");
-        }
+        await TryLoadBoolSetting("gesture", "gestureon",   "gesture ignition");
+        await TryLoadBoolSetting("gesture", "swingon",     "swing ignition");
+        await TryLoadBoolSetting("gesture", "twiston",     "twist ignition");
+        await TryLoadBoolSetting("gesture", "thruston",    "thrust ignition");
+        await TryLoadBoolSetting("gesture", "stabon",      "stab ignition");
+        await TryLoadBoolSetting("gesture", "twistoff",    "twist off");
+        await TryLoadBoolSetting("gesture", "powerlock",   "power lock");
+        await TryLoadBoolSetting("gesture", "forcepush",   "force push");
+        await TryLoadIntSetting ("gesture", "swingonspeed","swing on speed");
+        await TryLoadIntSetting ("gesture", "forcepushlen","force push length");
+        await TryLoadIntSetting ("gesture", "lockupdelay", "lockup delay");
+        await TryLoadIntSetting ("gesture", "clashdetect", "clash detect");
+        await TryLoadIntSetting ("gesture", "maxclash",    "max clash strength");
     }
 
     public async Task SaveSdAsync(bool val)
@@ -525,6 +535,7 @@ public class SaberStateService(SaberCommandService commands)
     /// <summary>Returns trimmed value, or null if the command is unsupported or returned empty.</summary>
     private async Task<string?> GetOptional(string cmd)
     {
+        // Match original app behavior: probe settings with retries and wait for the response.
         var s = await commands.Send(cmd, retry: true);
         return s.StartsWith("Whut?") || string.IsNullOrWhiteSpace(s) ? null : s.Trim();
     }

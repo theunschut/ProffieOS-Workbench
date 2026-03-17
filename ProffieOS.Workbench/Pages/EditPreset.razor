@@ -3,7 +3,6 @@
 @inject SaberStateService State
 @inject NavigationManager Nav
 @inject ISnackbar Snackbar
-@implements IDisposable
 
 <PageTitle>ProffieOS Workbench – Edit</PageTitle>
 
@@ -38,26 +37,3 @@
     <PresetsPanel Mode="@("Edit")" />
     <EditPanel />
 </div>
-
-@code {
-    protected override void OnInitialized()
-    {
-        if (Connection.State == ConnectionState.Disconnected)
-        {
-            Nav.NavigateTo("/");
-            return;
-        }
-
-        State.StateChanged += OnStateChanged;
-        Connection.StateChanged += OnConnectionStateChanged;
-    }
-
-    private void OnStateChanged() => InvokeAsync(StateHasChanged);
-    private void OnConnectionStateChanged() => InvokeAsync(StateHasChanged);
-
-    public void Dispose()
-    {
-        State.StateChanged -= OnStateChanged;
-        Connection.StateChanged -= OnConnectionStateChanged;
-    }
-}

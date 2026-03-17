@@ -6,14 +6,6 @@
     <div class="panel-header">
         <span class="starjedi-title panel-title">Settings</span>
     </div>
-    @if (!State.SettingsLoaded)
-    {
-        <div class="pa-4">
-            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
-        </div>
-    }
-    else
-    {
     <div class="panel-scroll">
         <div class="edit-fields">
 
@@ -100,20 +92,12 @@
 
         </div>
     </div>
-    }
 </div>
 
 @code {
     protected override void OnInitialized()
     {
         State.StateChanged += OnStateChanged;
-        _ = LoadAsync();
-    }
-
-    private async Task LoadAsync()
-    {
-        try { await State.LoadSettingsAsync(); }
-        catch (Exception ex) { Snackbar.Add($"Failed to load settings: {ex.Message}", Severity.Error); }
     }
 
     private void OnStateChanged() => InvokeAsync(StateHasChanged);

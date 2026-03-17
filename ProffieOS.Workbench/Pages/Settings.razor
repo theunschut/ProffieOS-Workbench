@@ -2,7 +2,7 @@
 @inject SaberConnectionService Connection
 @inject SaberStateService State
 @inject NavigationManager Nav
-@implements IDisposable
+@inject ISnackbar Snackbar
 
 <PageTitle>ProffieOS Workbench – Settings</PageTitle>
 
@@ -33,28 +33,16 @@
 </div>
 
 <div class="dashboard-panels">
-    <SettingsPanel />
+    @if (_isLoading)
+    {
+        <div class="panel settings-panel">
+            <div class="pa-4">
+                <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+            </div>
+        </div>
+    }
+    else
+    {
+        <SettingsPanel />
+    }
 </div>
-
-@code {
-    protected override void OnInitialized()
-    {
-        if (Connection.State == ConnectionState.Disconnected)
-        {
-            Nav.NavigateTo("/");
-            return;
-        }
-
-        State.StateChanged += OnStateChanged;
-        Connection.StateChanged += OnConnectionStateChanged;
-    }
-
-    private void OnStateChanged() => InvokeAsync(StateHasChanged);
-    private void OnConnectionStateChanged() => InvokeAsync(StateHasChanged);
-
-    public void Dispose()
-    {
-        State.StateChanged -= OnStateChanged;
-        Connection.StateChanged -= OnConnectionStateChanged;
-    }
-}

@@ -1,0 +1,24 @@
+@inject SaberStateService State
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<div class="panel">
+    <div class="panel-header">
+        <span class="starjedi-title panel-title">Controls</span>
+    </div>
+    <div class="panel-scroll">
+        <div class="card-grid">
+            <ControlButton Label="on"    Active="State.IsOn"  OnClick="TurnOn" />
+            <ControlButton Label="off"   Active="!State.IsOn" OnClick="TurnOff" />
+            <ControlButton Label="clash"     OnClick='() => Cmd("clash")' />
+            <ControlButton Label="blast"     OnClick='() => Cmd("blast")' />
+            <ControlButton Label="force"     OnClick='() => Cmd("force")' />
+            <ControlButton Label="lockup"    OnClick='() => Cmd("lockup")' />
+            <ControlButton Label="drag"      OnClick='() => Cmd("drag")' />
+            <ControlButton Label="melt"      OnClick='() => Cmd("melt")' />
+            <ControlButton Label="stab"      OnClick='() => Cmd("stab")' />
+            <ControlButton Label="lightning" OnClick='() => Cmd("lblock")' />
+            <ControlButton Label="stop track" OnClick="StopTrack" />
+        </div>
+    </div>
+</div>

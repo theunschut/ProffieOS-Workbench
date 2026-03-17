@@ -1,0 +1,29 @@
+@inject SaberStateService State
+@inject ISnackbar Snackbar
+
+<MudPaper Class="saber-card edit-card" Elevation="0">
+    <MudText Typo="Typo.caption" Class="field-label starjedi-title">variation</MudText>
+
+    <MudSlider T="int" Value="_value"
+               Min="0" Max="32767"
+               Class="variation-slider"
+               ValueChanged="OnSliderChanged" />
+
+    <div class="variation-row">
+        <MudIconButton Icon="@Icons.Material.Filled.Remove"
+                       Size="Size.Small"
+                       Class="saber-icon-btn"
+                       OnClick="Decrement" />
+
+        <MudNumericField T="int" Value="_value"
+                         Min="0" Max="32767"
+                         Variant="Variant.Outlined"
+                         Class="saber-input variation-input"
+                         ValueChanged="OnInputChanged" />
+
+        <MudIconButton Icon="@Icons.Material.Filled.Add"
+                       Size="Size.Small"
+                       Class="saber-icon-btn"
+                       OnClick="Increment" />
+    </div>
+</MudPaper>

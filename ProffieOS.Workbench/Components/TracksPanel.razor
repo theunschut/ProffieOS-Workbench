@@ -1,0 +1,36 @@
+@inject SaberStateService State
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<div class="panel">
+    <div class="panel-header">
+        <span class="starjedi-title panel-title">Tracks</span>
+    </div>
+    <div class="panel-scroll">
+        @if (!State.TrackList.Any())
+        {
+            <MudText Typo="Typo.caption" Class="pa-4 mud-text-secondary">
+                Waiting for track list...
+            </MudText>
+        }
+        else
+        {
+            <div class="card-grid">
+                @foreach (var track in State.TrackList)
+                {
+                    if (track.Length <= 4) continue;
+                    var t = track;
+                    var parts = t.Split('/');
+                    var title = parts[^1].Split('.')[0].ToLowerInvariant();
+                    var isPlaying = t == State.CurrentTrack;
+
+                    <MudPaper Class="@($"saber-card track-card{(isPlaying ? " active" : "")}")"
+                              Elevation="0"
+                              @onclick="@(_ => PlayTrack(t))">
+                        <span class="starjedi-title card-title">@title</span>
+                    </MudPaper>
+                }
+            </div>
+        }
+    </div>
+</div>

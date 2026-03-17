@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>ProffieOS Workbench</title>
+
+    <!--
+        BASE_PATH is a placeholder replaced at build/deploy time:
+          - GitHub Actions: sed replaces it with /${REPO_NAME}/
+          - Docker: envsubst replaces it with ${BASE_PATH} (defaults to /)
+        Leave as "/" for local development / Docker default.
+    -->
+    <base href="/" />
+
+    <link rel="preload" id="webassembly" />
+    <link rel="stylesheet" href="css/app.css" />
+    <link rel="icon" type="image/png" href="icon-256.png" />
+    <link href="ProffieOS.Workbench.styles.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    <link href="manifest.webmanifest" rel="manifest" />
+    <link rel="apple-touch-icon" sizes="256x256" href="icon-256.png" />
+    <script type="importmap"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Loading indicator while Blazor WASM initialises -->
+        <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#000;flex-direction:column;gap:1.5rem;">
+            <div style="font-family:sans-serif;color:#6060aa;font-size:1.1rem;letter-spacing:.1em;">LOADING...</div>
+            <svg width="60" height="60" viewBox="0 0 60 60">
+                <circle cx="30" cy="30" r="22" fill="none" stroke="#6060aa" stroke-width="3"
+                        stroke-dasharray="100" stroke-dashoffset="0"
+                        style="animation:spin 1.2s linear infinite;transform-origin:50% 50%;" />
+            </svg>
+            <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+        </div>
+    </div>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="." class="reload">Reload</a>
+        <span class="dismiss">🗙</span>
+    </div>
+
+    <script src="js/bluetooth.js"></script>
+    <script src="js/usb.js"></script>
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' });
+        }
+    </script>
+</body>
+</html>

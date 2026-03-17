@@ -1,0 +1,47 @@
+@inject SaberStateService State
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<div class="panel presets-panel">
+    <div class="panel-header">
+        <span class="starjedi-title panel-title">Presets</span>
+    </div>
+    <div class="panel-scroll">
+        <div class="card-grid">
+            @for (var i = 0; i < State.Presets.Count; i++)
+            {
+                var idx = i;
+                var preset = State.Presets[i];
+                var isActive = idx == State.CurrentPresetIndex;
+
+                <MudPaper Class="@($"saber-card preset-card{(isActive ? " active" : "")}")"
+                          Elevation="0"
+                          draggable="@(IsEditMode ? "true" : "false")"
+                          @ondragstart="@(_ => StartDrag(idx))"
+                          @ondrop="@(_ => Drop(idx))"
+                          @ondragover:preventDefault="true"
+                          @onclick="@(_ => SelectPreset(idx))"
+                          @ondblclick="@(_ => { if (IsEditMode) EditPreset(idx); })">
+                    <span class="starjedi-title card-title">@preset.Name.Replace("\\n", "\n")</span>
+                </MudPaper>
+            }
+
+            @if (IsEditMode)
+            {
+                <MudPaper Class="saber-card preset-card action-card"
+                          Elevation="0"
+                          @onclick="AddPreset">
+                    <span class="card-symbol">+</span>
+                </MudPaper>
+
+                <MudPaper Class="saber-card preset-card action-card danger-card"
+                          Elevation="0"
+                          @ondrop="DropDelete"
+                          @ondragover:preventDefault="true"
+                          @onclick="ConfirmDelete">
+                    <span class="card-symbol">🗑</span>
+                </MudPaper>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,46 @@
+@inject SaberStateService State
+@inject ISnackbar Snackbar
+
+<MudPaper Class="saber-card edit-card style-card" Elevation="0">
+    <MudText Typo="Typo.caption" Class="field-label starjedi-title">style @Blade</MudText>
+
+    <MudSelect T="string" Value="_selectedStyle"
+               Variant="Variant.Outlined"
+               Class="saber-input mb-2"
+               ValueChanged="OnStyleSelected">
+        @foreach (var name in State.NamedStyles.Keys)
+        {
+            <MudSelectItem T="string" Value="@name">@name.ToLowerInvariant()</MudSelectItem>
+        }
+    </MudSelect>
+
+    @if (_namedStyle is not null)
+    {
+        @for (var i = 0; i < _namedStyle.Args.Count; i++)
+        {
+            var arg = _namedStyle.Args[i];
+            if (arg.Type == "VOID") continue;
+            var idx = i;
+
+            <div class="arg-row">
+                <MudText Typo="Typo.caption" Class="arg-label">@GetArgLabel(arg, idx)</MudText>
+
+                @if (arg.Type == "COLOR")
+                {
+                    <input type="color"
+                           class="color-picker"
+                           value="@_argValues[idx]"
+                           @onchange="@(e => HandleColorChange(idx, e))" />
+                }
+                else if (arg.Type == "INT")
+                {
+                    <MudTextField T="string"
+                                  Value="_argValues[idx]"
+                                  ValueChanged="@(v => HandleIntChange(idx, v))"
+                                  Variant="Variant.Outlined"
+                                  Class="saber-input arg-input" />
+                }
+            </div>
+        }
+    }
+</MudPaper>

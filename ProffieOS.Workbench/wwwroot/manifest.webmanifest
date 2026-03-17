@@ -1,0 +1,17 @@
+{
+  "name": "ProffieOS Workbench",
+  "short_name": "ProffieOS",
+  "id": "./",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#2F3BA2",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "icon-256.png",
+      "type": "image/png",
+      "sizes": "256x256"
+    }
+  ]
+}

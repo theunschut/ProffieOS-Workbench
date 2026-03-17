@@ -1,0 +1,95 @@
+@inject SaberStateService State
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<div class="panel settings-panel">
+    <div class="panel-header">
+        <span class="starjedi-title panel-title">Settings</span>
+    </div>
+    <div class="panel-scroll">
+        <div class="edit-fields settings-grid">
+
+            @if (State.HasSdToggle)
+            {
+                <MudPaper Class="saber-card edit-card" Elevation="0">
+                    <div class="setting-row">
+                        <MudText Class="starjedi-title setting-label">sd card access</MudText>
+                        <MudSwitch T="bool" Value="State.SdEnabled"
+                                   Color="Color.Primary"
+                                   ValueChanged="SaveSd" />
+                    </div>
+                </MudPaper>
+            }
+
+            @if (State.HasBrightness)
+            {
+                <MudPaper Class="saber-card edit-card" Elevation="0">
+                    <MudText Typo="Typo.caption" Class="field-label starjedi-title">
+                        brightness: @State.Brightness%
+                    </MudText>
+                    <MudSlider T="int" Value="State.Brightness"
+                               Min="1" Max="100"
+                               Class="variation-slider"
+                               ValueChanged="SaveBrightness" />
+                </MudPaper>
+            }
+
+            @if (State.HasClashThreshold)
+            {
+                <MudPaper Class="saber-card edit-card" Elevation="0">
+                    <MudText Typo="Typo.caption" Class="field-label starjedi-title">
+                        clash threshold: @State.ClashThreshold.ToString("F2")
+                    </MudText>
+                    <MudSlider T="float" Value="State.ClashThreshold"
+                               Min="0.5f" Max="6.0f" Step="0.05f"
+                               Class="variation-slider"
+                               ValueChanged="SaveClashThreshold" />
+                </MudPaper>
+            }
+
+            @for (var b = 1; b <= State.BladeLengths.Count; b++)
+            {
+                var blade = b;
+                <MudPaper Class="saber-card edit-card" Elevation="0">
+                    <MudText Typo="Typo.caption" Class="field-label starjedi-title">
+                        blade @blade length
+                    </MudText>
+                    <MudNumericField T="int"
+                                     Value="State.BladeLengths[blade - 1]"
+                                     Min="0" Max="@State.MaxBladeLength"
+                                     Variant="Variant.Outlined"
+                                     Class="saber-input"
+                                     ValueChanged="@(v => SaveBladeLength(blade, v))" />
+                </MudPaper>
+            }
+
+            @for (var i = 0; i < State.GestureBoolSettings.Count; i++)
+            {
+                var idx = i;
+                var s = State.GestureBoolSettings[i];
+                <MudPaper Class="saber-card edit-card" Elevation="0">
+                    <div class="setting-row">
+                        <MudText Class="starjedi-title setting-label">@s.Label</MudText>
+                        <MudSwitch T="bool" Value="@s.Value"
+                                   Color="Color.Primary"
+                                   ValueChanged="@(v => SaveBoolGesture(idx, v))" />
+                    </div>
+                </MudPaper>
+            }
+
+            @for (var i = 0; i < State.GestureIntSettings.Count; i++)
+            {
+                var idx = i;
+                var s = State.GestureIntSettings[i];
+                <MudPaper Class="saber-card edit-card" Elevation="0">
+                    <MudText Typo="Typo.caption" Class="field-label starjedi-title">@s.Label</MudText>
+                    <MudNumericField T="int" Value="s.Value"
+                                     Variant="Variant.Outlined"
+                                     Class="saber-input"
+                                     ValueChanged="@(v => SaveIntGesture(idx, v))" />
+                </MudPaper>
+            }
+
+        </div>
+    </div>
+</div>

@@ -6,65 +6,65 @@
 
 <PageTitle>ProffieOS Workbench</PageTitle>
 
-<div class="connect-page">
-    <div class="connect-logo">
-        <span class="starjedi-title">Proffieos<br />Workbench</span>
+<div class="hs-screen">
+
+    <div class="hs-brand">
+        <span class="starjedi-title hs-title">Proffieos<br />Workbench</span>
+        <span class="hs-tagline">saber control interface</span>
     </div>
 
     @if (!Connection.BluetoothAvailable && !Connection.UsbAvailable)
     {
-        <MudAlert Severity="Severity.Error" Style="max-width:440px;">
+        <MudAlert Severity="Severity.Error" Style="max-width:460px;">
             This browser supports neither Web Bluetooth nor WebUSB.
             Use a Chromium-based browser (Chrome, Edge).
         </MudAlert>
     }
 
-    <div class="connect-section-divider">select connection protocol</div>
+    <div class="hs-divider">select protocol</div>
 
-    <div class="connect-buttons">
+    <div class="hs-tiles">
         @if (Connection.UsbAvailable)
         {
-            <div class="connect-card @(_busy ? "connect-card-busy" : "")"
-                 @onclick="ConnectUsbAsync">
+            <div class="hs-tile @(_busy ? "hs-tile-busy" : "")" @onclick="ConnectUsbAsync">
                 @if (_busy && _connectingVia == "usb")
                 {
                     <MudProgressCircular Size="Size.Large" Indeterminate="true" Color="Color.Primary" />
                 }
                 else
                 {
-                    <MudIcon Icon="@Icons.Material.Filled.Usb" Class="connect-card-icon" />
+                    <MudIcon Icon="@Icons.Material.Filled.Usb" Class="hs-tile-icon" />
                 }
-                <span class="connect-card-title">usb</span>
-                <span class="connect-card-sub">wired protocol</span>
+                <span class="starjedi-title hs-tile-name">usb</span>
+                <span class="hs-tile-desc">wired connection</span>
             </div>
         }
 
         @if (Connection.BluetoothAvailable)
         {
-            <div class="connect-card @(_busy ? "connect-card-busy" : "")"
-                 @onclick="TogglePasswordField">
+            <div class="hs-tile @(_busy ? "hs-tile-busy" : "")" @onclick="TogglePasswordField">
                 @if (_busy && _connectingVia == "ble")
                 {
                     <MudProgressCircular Size="Size.Large" Indeterminate="true" Color="Color.Primary" />
                 }
                 else
                 {
-                    <MudIcon Icon="@Icons.Material.Filled.Bluetooth" Class="connect-card-icon" />
+                    <MudIcon Icon="@Icons.Material.Filled.Bluetooth" Class="hs-tile-icon" />
                 }
-                <span class="connect-card-title">ble</span>
-                <span class="connect-card-sub">wireless protocol</span>
+                <span class="starjedi-title hs-tile-name">ble</span>
+                <span class="hs-tile-desc">wireless connection</span>
             </div>
         }
     </div>
 
     @if (_showPassword)
     {
-        <div class="password-area">
+        <div class="hs-password">
             <MudTextField @bind-Value="_password"
                           Label="Password (optional)"
                           InputType="InputType.Password"
                           Variant="Variant.Outlined"
-                          Class="password-field"
+                          Class="hs-pw-field"
                           OnKeyDown="OnPasswordKeyDown" />
             <MudButton Variant="Variant.Outlined"
                        Color="Color.Primary"
@@ -80,6 +80,7 @@
         </div>
     }
 
-    <div class="connect-section-divider">previously paired</div>
+    <div class="hs-divider">previously paired</div>
     <KnownDevicesPanel Disabled="_busy" OnConnect="ConnectKnownAsync" />
+
 </div>

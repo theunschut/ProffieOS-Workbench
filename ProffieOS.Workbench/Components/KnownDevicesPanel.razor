@@ -1,10 +1,10 @@
 @inject IJSRuntime JS
 
-<div class="known-devices">
-    <div class="known-devices-title">known devices</div>
+<div class="hs-known">
+    <div class="hs-known-title">known devices</div>
     @if (_devices.Count == 0)
     {
-        <div class="known-devices-empty">none</div>
+        <div class="hs-known-empty">none</div>
     }
     else
     {
@@ -15,7 +15,7 @@
                 <MudListItem T="string"
                              Disabled="Disabled"
                              OnClick="@(async _ => await OnConnect.InvokeAsync(device))"
-                             Style="border:1px solid rgba(26,100,180,0.30); border-radius:4px 20px; margin:3px 0; background:rgba(3,10,30,0.88); padding:6px 14px;">
+                             Style="border:1px solid rgba(0,155,215,0.28); border-radius:4px 18px; margin:3px 0; background:rgba(0,14,34,0.90); padding:6px 14px;">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <MudChip T="string"
                                  Size="Size.Small"
@@ -24,7 +24,7 @@
                                  Style="font-family:StarJedi,sans-serif; font-size:0.68rem; height:20px; min-width:36px;">
                             @d.type
                         </MudChip>
-                        <span style="font-size:0.88rem; color:#c0dcff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">@d.name</span>
+                        <span style="font-size:0.88rem; color:#b0d8f8; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">@d.name</span>
                     </div>
                 </MudListItem>
             }

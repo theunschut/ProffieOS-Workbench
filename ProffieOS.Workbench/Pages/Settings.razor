@@ -8,9 +8,9 @@
 
 @if (Connection.State == ConnectionState.Disconnected)
 {
-    <div class="connect-page">
-        <div class="connect-logo">
-            <span class="starjedi-title">disconnected</span>
+    <div class="hs-screen">
+        <div class="hs-brand">
+            <span class="starjedi-title hs-title">disconnected</span>
         </div>
         <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="saber-btn"
                    OnClick="@(() => Nav.NavigateTo(""))">
@@ -20,15 +20,15 @@
     return;
 }
 
-<div class="app-header">
+<header class="wb-header">
     <MudTooltip Text="Back to dashboard" Placement="Placement.Bottom" Delay="400">
         <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
-                       Class="mode-btn"
+                       Class="wb-icon-btn"
                        OnClick="@(() => Nav.NavigateTo("dashboard"))" />
     </MudTooltip>
-    <span class="starjedi-title app-title">settings</span>
-    <div class="header-spacer"></div>
-</div>
+    <span class="starjedi-title wb-title">settings</span>
+    <div class="wb-header-spacer"></div>
+</header>
 
 <div class="dashboard-panels">
     @if (_isLoading)

@@ -1,11 +1,9 @@
 @inject SaberStateService State
 
-<MudPaper Class="@($"control-btn{(Active ? " active" : "")}")"
-          Elevation="0"
-          @onclick="HandleClick">
+<button class="wb-btn @(Active ? "active" : "")" type="button" @onclick="HandleClick">
     @if (!string.IsNullOrEmpty(Icon))
     {
-        <MudIcon Icon="@Icon" Class="control-btn-icon" />
+        <MudIcon Icon="@Icon" Class="wb-btn-icon" />
     }
-    <span class="control-btn-label">@Label</span>
-</MudPaper>
+    <span class="wb-btn-label">@Label</span>
+</button>

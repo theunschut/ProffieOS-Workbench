@@ -10,7 +10,7 @@ public partial class TracksPanel : IDisposable
 
     private async Task PlayTrack(string track)
     {
-        try { await State.PlayTrackAsync(Uri.EscapeDataString(track)); }
+        try { await State.PlayTrackAsync(track); }
         catch (Exception ex) { Snackbar.Add($"Play failed: {ex.Message}", Severity.Error); }
     }
 

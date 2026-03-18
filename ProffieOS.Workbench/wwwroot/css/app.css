@@ -5,46 +5,187 @@
     unicode-range: U+0000-0024, U+26-003a, U+3c-5e, U+60-ff;
 }
 
-/* ── Reset / base ──────────────────────────────────────────── */
+/* ── Reset ─────────────────────────────────────────────────── */
 html, body {
     height: 100%;
     margin: 0;
     overflow: hidden;
-    background: #000;
+    background: #000514;
     color: #add8e6;
 }
 
-/* ── Star Jedi helper class ────────────────────────────────── */
+/* ── Nebula + starfield ─────────────────────────────────────── */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+        radial-gradient(ellipse 80% 55% at 10% 15%, rgba(80,30,200,0.12) 0%, transparent 65%),
+        radial-gradient(ellipse 60% 70% at 90% 85%, rgba(20,60,200,0.09) 0%, transparent 65%),
+        radial-gradient(ellipse 45% 45% at 50% 50%, rgba(40,0,100,0.07) 0%, transparent 80%),
+        radial-gradient(circle 1px at 7%  9%,  rgba(255,255,255,0.75) 0%, transparent 100%),
+        radial-gradient(circle 1px at 17% 4%,  rgba(255,255,255,0.55) 0%, transparent 100%),
+        radial-gradient(circle 1px at 31% 17%, rgba(255,255,255,0.65) 0%, transparent 100%),
+        radial-gradient(circle 1px at 44% 2%,  rgba(255,255,255,0.70) 0%, transparent 100%),
+        radial-gradient(circle 1px at 59% 11%, rgba(255,255,255,0.50) 0%, transparent 100%),
+        radial-gradient(circle 1px at 74% 6%,  rgba(255,255,255,0.80) 0%, transparent 100%),
+        radial-gradient(circle 1px at 87% 14%, rgba(255,255,255,0.60) 0%, transparent 100%),
+        radial-gradient(circle 1px at 96% 4%,  rgba(255,255,255,0.55) 0%, transparent 100%),
+        radial-gradient(circle 1px at 2%  29%, rgba(255,255,255,0.40) 0%, transparent 100%),
+        radial-gradient(circle 1px at 11% 41%, rgba(255,255,255,0.65) 0%, transparent 100%),
+        radial-gradient(circle 1px at 24% 34%, rgba(255,255,255,0.50) 0%, transparent 100%),
+        radial-gradient(circle 1px at 37% 47%, rgba(255,255,255,0.45) 0%, transparent 100%),
+        radial-gradient(circle 1px at 51% 27%, rgba(255,255,255,0.70) 0%, transparent 100%),
+        radial-gradient(circle 1px at 64% 37%, rgba(255,255,255,0.55) 0%, transparent 100%),
+        radial-gradient(circle 1px at 77% 24%, rgba(255,255,255,0.60) 0%, transparent 100%),
+        radial-gradient(circle 1px at 91% 32%, rgba(255,255,255,0.50) 0%, transparent 100%),
+        radial-gradient(circle 1px at 6%  59%, rgba(255,255,255,0.60) 0%, transparent 100%),
+        radial-gradient(circle 1px at 19% 71%, rgba(255,255,255,0.45) 0%, transparent 100%),
+        radial-gradient(circle 1px at 34% 64%, rgba(255,255,255,0.55) 0%, transparent 100%),
+        radial-gradient(circle 1px at 47% 77%, rgba(255,255,255,0.70) 0%, transparent 100%),
+        radial-gradient(circle 1px at 61% 57%, rgba(255,255,255,0.50) 0%, transparent 100%),
+        radial-gradient(circle 1px at 71% 69%, rgba(255,255,255,0.45) 0%, transparent 100%),
+        radial-gradient(circle 1px at 84% 61%, rgba(255,255,255,0.65) 0%, transparent 100%),
+        radial-gradient(circle 1px at 94% 74%, rgba(255,255,255,0.60) 0%, transparent 100%),
+        radial-gradient(circle 1px at 9%  87%, rgba(255,255,255,0.50) 0%, transparent 100%),
+        radial-gradient(circle 1px at 27% 91%, rgba(255,255,255,0.40) 0%, transparent 100%),
+        radial-gradient(circle 1px at 41% 84%, rgba(255,255,255,0.60) 0%, transparent 100%),
+        radial-gradient(circle 1px at 57% 94%, rgba(255,255,255,0.55) 0%, transparent 100%),
+        radial-gradient(circle 1px at 69% 87%, rgba(255,255,255,0.45) 0%, transparent 100%),
+        radial-gradient(circle 1px at 81% 91%, rgba(255,255,255,0.70) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.mud-layout,
+.mud-main-content {
+    background: transparent !important;
+}
+
+/* ── StarJedi helper ────────────────────────────────────────── */
 .starjedi-title {
     font-family: StarJedi, sans-serif;
     line-height: 1.0;
 }
 
-/* ── Connect page ──────────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════
+   CONNECT PAGE
+   ════════════════════════════════════════════════════════════ */
 .connect-page {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100vh;
-    gap: 2rem;
+    gap: 2.2rem;
 }
 
 .connect-logo {
     text-align: center;
-    line-height: 1.1;
-    font-size: 2.5rem;
+    font-size: 3rem;
+    line-height: 1.18;
+    letter-spacing: 0.04em;
+    text-shadow:
+        0 0 24px rgba(100,148,224,0.85),
+        0 0 56px rgba(80,80,210,0.45),
+        0 0 100px rgba(60,60,180,0.22);
+}
+
+/* "── select connection protocol ──" divider */
+.connect-section-divider {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: rgba(173,216,230,0.36);
+    font-family: sans-serif;
+    font-size: 0.63rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    width: 100%;
+    max-width: 420px;
+}
+
+.connect-section-divider::before,
+.connect-section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(96,96,170,0.42));
+}
+
+.connect-section-divider::after {
+    background: linear-gradient(90deg, rgba(96,96,170,0.42), transparent);
 }
 
 .connect-buttons {
     display: flex;
-    gap: 1.5rem;
+    gap: 2rem;
     flex-wrap: wrap;
     justify-content: center;
 }
 
-.connect-btn {
-    min-width: 160px;
+/* Corner-notched connect card */
+.connect-card {
+    width: 164px;
+    height: 178px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    background: rgba(8, 8, 40, 0.90);
+    border: 1px solid rgba(96, 96, 170, 0.48);
+    clip-path: polygon(
+        0 0,
+        calc(100% - 22px) 0,
+        100% 22px,
+        100% 100%,
+        22px 100%,
+        0 calc(100% - 22px)
+    );
+    transition: background 0.2s ease, filter 0.2s ease;
+}
+
+.connect-card:hover {
+    background: rgba(16, 16, 68, 0.95);
+    filter: drop-shadow(0 0 14px rgba(96,96,200,0.6)) drop-shadow(0 0 30px rgba(80,80,200,0.25));
+}
+
+.connect-card:active {
+    background: rgba(44, 44, 108, 0.95);
+    filter: drop-shadow(0 0 20px rgba(96,96,200,0.8));
+}
+
+.connect-card-busy {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.connect-card-icon {
+    font-size: 2.8rem !important;
+    height: 2.8rem !important;
+    width: 2.8rem !important;
+    color: #add8e6 !important;
+    opacity: 0.82;
+}
+
+.connect-card-title {
+    font-family: StarJedi, sans-serif;
+    font-size: 1.05rem;
+    color: #add8e6;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 10px rgba(96,144,220,0.48);
+}
+
+.connect-card-sub {
+    font-family: sans-serif;
+    font-size: 0.58rem;
+    color: rgba(173,216,230,0.40);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-top: -4px;
 }
 
 .password-area {
@@ -53,31 +194,460 @@ html, body {
     align-items: flex-end;
     flex-wrap: wrap;
     justify-content: center;
+    background: rgba(8, 8, 36, 0.80);
+    border: 1px solid rgba(96,96,170,0.32);
+    padding: 16px 20px;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
 }
 
-.password-field {
-    min-width: 220px;
+.password-field { min-width: 220px; }
+
+/* Known devices */
+.known-devices {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    max-width: 420px;
+    width: 100%;
 }
 
-/* ── Saber button / card shared style ──────────────────────── */
+.known-devices-title {
+    font-family: StarJedi, sans-serif;
+    font-size: 0.82rem;
+    color: rgba(173,216,230,0.38);
+    letter-spacing: 0.1em;
+}
+
+.known-devices-empty {
+    font-family: StarJedi, sans-serif;
+    font-size: 0.78rem;
+    color: rgba(173,216,230,0.26);
+    text-align: center;
+    padding: 4px 0;
+}
+
+/* Saber button (MudButton used across pages) */
 .saber-btn {
     font-family: StarJedi, sans-serif;
-    border-color: #6060aa !important;
+    border-color: rgba(96,96,170,0.62) !important;
     color: #add8e6 !important;
-    transition: background-color 0.1s, transform 0.1s, box-shadow 0.1s;
+    transition: all 0.12s;
+}
+
+.saber-btn:hover {
+    background: rgba(20,20,76,0.55) !important;
+    border-color: rgba(144,144,204,0.88) !important;
 }
 
 .saber-btn:active,
 .saber-btn:focus-visible {
     transform: scale(0.93);
-    box-shadow: 0 0 8px #6060aa88 !important;
+    filter: drop-shadow(0 0 6px rgba(96,96,170,0.5));
 }
 
-/* ── Saber card (preset / track / control) ─────────────────── */
+/* ════════════════════════════════════════════════════════════
+   APP SHELL (dashboard, wraps header + body + footer)
+   ════════════════════════════════════════════════════════════ */
+.app-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Subtle scanline overlay — holographic CRT texture */
+.app-shell::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 3px,
+        rgba(0, 0, 40, 0.045) 3px,
+        rgba(0, 0, 40, 0.045) 4px
+    );
+    pointer-events: none;
+    z-index: 999;
+}
+
+/* ── App Header ─────────────────────────────────────────────── */
+.app-header {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px 0 16px;
+    gap: 10px;
+    background: rgba(3, 3, 16, 0.97);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+    backdrop-filter: blur(16px);
+}
+
+.app-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(96,96,170,0.28) 8%,
+        rgba(144,144,204,0.58) 50%,
+        rgba(96,96,170,0.28) 92%,
+        transparent 100%);
+}
+
+.app-title {
+    font-size: 1.18rem;
+    letter-spacing: 0.04em;
+    text-shadow: 0 0 18px rgba(96,144,220,0.55);
+    flex-shrink: 0;
+}
+
+.header-spacer { flex: 1; min-width: 0; }
+
+.volume-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    max-width: 340px;
+}
+
+.volume-slider { flex: 1; }
+
+.battery-chip {
+    font-size: 0.7rem !important;
+    height: 26px !important;
+    color: rgba(173,216,230,0.62) !important;
+    border-color: rgba(96,96,170,0.36) !important;
+}
+
+.mode-btn {
+    color: rgba(173,216,230,0.68) !important;
+    border: 1px solid rgba(96,96,170,0.36) !important;
+    border-radius: 4px !important;
+    transition: all 0.14s !important;
+}
+
+.mode-btn:hover {
+    background: rgba(20,20,72,0.7) !important;
+    border-color: rgba(96,96,170,0.88) !important;
+    color: #add8e6 !important;
+}
+
+.mode-btn:active { transform: scale(0.88); }
+
+.reconnecting-banner {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+/* ── App Body: 3-panel grid ─────────────────────────────────── */
+.app-body {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 190px 1fr 212px;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* ════════════════════════════════════════════════════════════
+   LEFT PANEL — CONTROLS
+   ════════════════════════════════════════════════════════════ */
+.controls-panel {
+    display: flex;
+    flex-direction: column;
+    background: rgba(4, 4, 20, 0.93);
+    border-right: 1px solid rgba(36,36,96,0.50);
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    min-height: 0;
+}
+
+/* Shared panel label row (used in controls + tracks panels) */
+.panel-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px 8px 10px;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.panel-label::before {
+    content: '';
+    width: 3px;
+    height: 13px;
+    background: linear-gradient(180deg, rgba(160,160,240,0.88) 0%, rgba(96,96,170,0.28) 100%);
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.panel-label::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10px;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(96,96,170,0.5), transparent);
+}
+
+.panel-label-text {
+    font-family: StarJedi, sans-serif;
+    font-size: 0.80rem;
+    color: rgba(173,216,230,0.60);
+    letter-spacing: 0.08em;
+}
+
+/* 2×6 grid of control buttons */
+.cmd-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    padding: 8px;
+    flex: 1;
+    min-height: 0;
+    align-content: stretch;
+}
+
+/* Stop Track spans full width as last item */
+.cmd-grid > :last-child {
+    grid-column: 1 / -1;
+}
+
+/* Control button — fills its grid cell */
+.control-btn {
+    background: rgba(7, 7, 32, 0.90) !important;
+    border: 1px solid rgba(96, 96, 170, 0.30) !important;
+    border-radius: 4px !important;
+    color: #add8e6;
+    cursor: pointer;
+    user-select: none;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px;
+    padding: 6px 4px;
+    transition: background 0.13s, border-color 0.13s, transform 0.10s, filter 0.13s;
+    min-height: 0;
+    min-width: 0;
+}
+
+.control-btn:hover {
+    background: rgba(18, 18, 72, 0.92) !important;
+    border-color: rgba(96, 96, 170, 0.68) !important;
+}
+
+.control-btn:active {
+    transform: scale(0.89);
+    background: rgba(44, 44, 110, 0.94) !important;
+    filter: drop-shadow(0 0 6px rgba(96,96,170,0.48));
+}
+
+.control-btn.active {
+    background: rgba(48, 48, 114, 0.93) !important;
+    border-color: rgba(144, 144, 220, 0.75) !important;
+    filter: drop-shadow(0 0 9px rgba(144,144,204,0.42));
+}
+
+.control-btn-icon {
+    font-size: 1.22rem !important;
+    height: 1.22rem !important;
+    width: 1.22rem !important;
+    color: rgba(173,216,230,0.85) !important;
+}
+
+.control-btn.active .control-btn-icon {
+    color: #cce8ff !important;
+}
+
+.control-btn-label {
+    font-family: StarJedi, sans-serif;
+    font-size: 0.54rem;
+    line-height: 1.15;
+    opacity: 0.75;
+    text-align: center;
+    white-space: normal;
+    word-break: break-word;
+    letter-spacing: 0.02em;
+    max-width: 80px;
+}
+
+.control-btn.active .control-btn-label { opacity: 1; }
+
+/* ════════════════════════════════════════════════════════════
+   CENTER — SABER IMAGE + ACTIVE PRESET
+   ════════════════════════════════════════════════════════════ */
+.center-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    gap: 14px;
+    padding: 12px 8px;
+    min-height: 0;
+}
+
+.saber-image-wrap {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.saber-image {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+    display: block;
+    filter:
+        drop-shadow(0 0 16px rgba(96,148,224,0.42))
+        drop-shadow(0 0 44px rgba(80,80,210,0.20));
+}
+
+/* Corner-notched "active preset" indicator */
+.active-preset-card {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 10px 32px;
+    background: rgba(7, 7, 34, 0.85);
+    border: 1px solid rgba(96,96,170,0.34);
+    clip-path: polygon(
+        0 0,
+        calc(100% - 12px) 0,
+        100% 12px,
+        100% 100%,
+        12px 100%,
+        0 calc(100% - 12px)
+    );
+}
+
+.active-preset-label {
+    font-family: sans-serif;
+    font-size: 0.58rem;
+    color: rgba(173,216,230,0.36);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+}
+
+.active-preset-name {
+    font-size: 1.3rem;
+    color: #add8e6;
+    text-shadow: 0 0 16px rgba(96,144,220,0.52);
+    letter-spacing: 0.04em;
+}
+
+/* ════════════════════════════════════════════════════════════
+   RIGHT PANEL — TRACKS
+   ════════════════════════════════════════════════════════════ */
+.info-panel {
+    display: flex;
+    flex-direction: column;
+    background: rgba(4, 4, 20, 0.93);
+    border-left: 1px solid rgba(36,36,96,0.50);
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    min-height: 0;
+}
+
+/* Mirror the accent bar to the right for the info panel */
+.info-panel > .panel-label {
+    flex-direction: row-reverse;
+    padding: 10px 10px 8px 12px;
+}
+
+.info-panel > .panel-label::after {
+    left: 0;
+    right: 10px;
+    background: linear-gradient(90deg, transparent, rgba(96,96,170,0.5));
+}
+
+.panel-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 6px;
+    min-height: 0;
+}
+
+.panel-scroll::-webkit-scrollbar { width: 3px; }
+.panel-scroll::-webkit-scrollbar-track { background: transparent; }
+.panel-scroll::-webkit-scrollbar-thumb { background: rgba(96,96,170,0.45); border-radius: 2px; }
+
+/* Track list items */
+.track-list-item {
+    border-radius: 4px !important;
+    margin: 2px 0 !important;
+    padding: 7px 10px !important;
+    transition: background-color 0.13s !important;
+}
+
+.track-list-item:hover {
+    background: rgba(18, 18, 72, 0.72) !important;
+}
+
+.track-list-item.active-track {
+    background: rgba(38, 38, 96, 0.90) !important;
+    border-left: 2px solid rgba(144,144,220,0.70) !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   PRESETS BAR (footer)
+   ════════════════════════════════════════════════════════════ */
+.presets-bar {
+    flex-shrink: 0;
+    background: rgba(3, 3, 16, 0.94);
+    padding: 6px 10px 8px;
+    backdrop-filter: blur(12px);
+    position: relative;
+}
+
+.presets-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(96,96,170,0.28) 10%,
+        rgba(144,144,204,0.55) 50%,
+        rgba(96,96,170,0.28) 90%,
+        transparent 100%);
+}
+
+.presets-bar-scroll {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    justify-content: safe center;
+}
+
+.presets-bar-scroll::-webkit-scrollbar { height: 3px; }
+.presets-bar-scroll::-webkit-scrollbar-track { background: transparent; }
+.presets-bar-scroll::-webkit-scrollbar-thumb { background: rgba(96,96,170,0.50); border-radius: 2px; }
+
+/* Preset card — corner-notched */
 .saber-card {
-    background: #101040 !important;
-    border: 2px solid #6060aa !important;
-    border-radius: 15px 50px !important;
+    background: rgba(8, 8, 38, 0.85) !important;
+    border: 1px solid rgba(96, 96, 170, 0.38) !important;
     color: #add8e6;
     cursor: pointer;
     user-select: none;
@@ -86,155 +656,127 @@ html, body {
     justify-content: center;
     text-align: center;
     padding: 8px;
-    transition: background-color 0.12s, transform 0.1s, box-shadow 0.12s;
-    min-height: 80px;
-    min-width: 180px;
+    transition: background 0.13s, border-color 0.13s, transform 0.10s, filter 0.13s;
+    min-height: 68px;
+    min-width: 108px;
+    clip-path: polygon(
+        0 0,
+        calc(100% - 10px) 0,
+        100% 10px,
+        100% 100%,
+        10px 100%,
+        0 calc(100% - 10px)
+    );
 }
 
 .saber-card:hover {
-    background: #18185a !important;
-    box-shadow: 0 0 6px #6060aa66;
+    background: rgba(18, 18, 72, 0.90) !important;
+    border-color: rgba(96, 96, 170, 0.70) !important;
 }
 
 .saber-card:active {
-    transform: scale(0.94);
-    box-shadow: 0 0 10px #6060aaaa;
-    background: #303080 !important;
+    transform: scale(0.92);
+    filter: drop-shadow(0 0 8px rgba(96,96,170,0.52));
+    background: rgba(44, 44, 110, 0.94) !important;
 }
 
 .saber-card.active {
-    background: #505080 !important;
-    border-color: #9090cc !important;
-    box-shadow: 0 0 8px #9090cc66;
+    background: rgba(42, 42, 104, 0.94) !important;
+    border-color: rgba(144, 144, 220, 0.72) !important;
+    filter: drop-shadow(0 0 10px rgba(144,144,204,0.36));
 }
 
-/* ── Card symbol (+ / trash) ───────────────────────────────── */
-.card-symbol {
-    font-size: 2rem;
-    line-height: 1;
-}
+.card-symbol { font-size: 1.8rem; line-height: 1; }
 
 .card-title {
-    font-size: 1.1rem;
+    font-size: 0.92rem;
     white-space: pre-line;
 }
 
 .action-card {
     border-style: dashed !important;
-    opacity: 0.75;
+    opacity: 0.68;
 }
 
 .danger-card:hover {
-    border-color: #cf6679 !important;
+    border-color: rgba(207,102,121,0.78) !important;
 }
 
-/* ── Dashboard layout ──────────────────────────────────────── */
-.dashboard-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 6px 12px;
-    background: #0a0a2a;
-    border-bottom: 1px solid #303070;
+.presets-bar-card {
+    min-width: 108px !important;
+    min-height: 68px !important;
     flex-shrink: 0;
+    flex-direction: column !important;
+    gap: 2px;
+    position: relative;
 }
 
-.header-left  { flex: 0 0 auto; }
-.header-center { flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.header-right { flex: 0 0 auto; display: flex; gap: 4px; }
-
-.appname { font-size: 1.4rem; }
-
-.volume-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    max-width: 400px;
+.preset-index {
+    font-family: monospace;
+    font-size: 0.54rem;
+    opacity: 0.36;
+    position: absolute;
+    top: 5px;
+    left: 7px;
+    line-height: 1;
 }
 
-.volume-slider { flex: 1; }
+.saber-card.active .preset-index { opacity: 0.60; }
 
-.mode-btn {
-    color: #add8e6 !important;
-    border: 1px solid #6060aa;
-    border-radius: 12px !important;
-    transition: background-color 0.1s, transform 0.1s;
-}
-
-.mode-btn:active { transform: scale(0.88); }
-
-.reconnecting-banner {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-/* ── Panels ────────────────────────────────────────────────── */
-.dashboard-panels {
-    display: flex;
-    height: calc(100vh - 62px);
-    overflow: hidden;
-}
-
+/* ════════════════════════════════════════════════════════════
+   PANEL (TracksPanel internal, also used in edit/settings)
+   ════════════════════════════════════════════════════════════ */
 .panel {
     display: flex;
     flex-direction: column;
     flex: 1 1 0;
+    min-height: 0;
     min-width: 0;
-    border-right: 1px solid #303070;
 }
 
-.panel:last-child { border-right: none; }
-
-.settings-panel {
-    flex: 0 0 100%;
-}
-
-.edit-panel {
-    flex: 0 0 340px;
-}
-
-.edit-layout .presets-panel {
-    flex: 0 0 33.333%;
-}
-
-.edit-layout .edit-panel {
-    flex: 0 0 66.667%;
-}
-
+/* panel-header: rounded style used in PresetsPanel / EditPanel / SettingsPanel */
 .panel-header {
     flex-shrink: 0;
-    padding: 6px 8px;
-    background: #0a0a2a;
-    border-bottom: 1px solid #303070;
-    border-radius: 20px 20px 8px 8px;
+    padding: 9px 12px 7px;
+    background: rgba(3, 3, 16, 0.92);
+    border-radius: 18px 18px 6px 6px;
     margin: 4px 4px 0;
     text-align: center;
+    position: relative;
 }
 
-.panel-title { font-size: 1rem; }
-
-.panel-scroll {
-    flex: 1;
-    overflow-y: auto;
-    padding: 6px;
+.panel-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 12px;
+    right: 12px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(96,96,170,0.48), transparent);
 }
 
-.panel-scroll::-webkit-scrollbar { width: 6px; }
-.panel-scroll::-webkit-scrollbar-track { background: #0a0a2a; }
-.panel-scroll::-webkit-scrollbar-thumb { background: #6060aa; border-radius: 3px; }
+.panel-title {
+    font-family: StarJedi, sans-serif;
+    font-size: 0.88rem;
+    text-shadow: 0 0 8px rgba(96,144,220,0.38);
+}
 
-/* ── Card grid inside panels ───────────────────────────────── */
-.card-grid {
+/* ════════════════════════════════════════════════════════════
+   EDIT / SETTINGS PAGES
+   ════════════════════════════════════════════════════════════ */
+.dashboard-panels {
     display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    justify-content: center;
-    padding: 4px;
+    flex-direction: row;
+    height: calc(100vh - 56px);
+    overflow: hidden;
 }
 
-/* ── Edit / settings fields ────────────────────────────────── */
+.settings-panel { flex: 0 0 100%; }
+.edit-panel      { flex: 0 0 340px; }
+
+.edit-layout .presets-panel { flex: 0 0 33.333%; }
+.edit-layout .edit-panel    { flex: 0 0 66.667%; }
+
 .edit-fields {
     display: flex;
     flex-direction: column;
@@ -259,25 +801,11 @@ html, body {
     align-items: start;
 }
 
-.settings-grid .edit-card {
-    width: 320px;
-    max-width: 100%;
-    justify-self: center;
-}
+.settings-grid .edit-card { width: 320px; max-width: 100%; justify-self: center; }
+.edit-grid .edit-card      { width: 100%; max-width: none; justify-self: stretch; }
 
-.edit-grid .edit-card {
-    width: 100%;
-    max-width: none;
-    justify-self: stretch;
-}
-
-.style-editors-section {
-    grid-column: 1 / -1;
-}
-
-.style-section-title {
-    margin: 0 0 8px 4px;
-}
+.style-editors-section  { grid-column: 1 / -1; }
+.style-section-title    { margin: 0 0 8px 4px; }
 
 .style-editors-grid {
     display: grid;
@@ -286,18 +814,13 @@ html, body {
     align-items: start;
 }
 
-.style-editors-grid .edit-card {
-    width: 100%;
-    max-width: none;
-    justify-self: stretch;
-}
-
-.style-editors-grid .style-card {
-    min-width: 0 !important;
-}
+.style-editors-grid .edit-card  { width: 100%; max-width: none; justify-self: stretch; }
+.style-editors-grid .style-card { min-width: 0 !important; }
 
 .edit-card {
-    border-radius: 12px 30px !important;
+    background: rgba(8, 8, 38, 0.85) !important;
+    border: 1px solid rgba(96,96,170,0.36) !important;
+    border-radius: 4px 18px !important;
     min-height: unset !important;
     flex-direction: column !important;
     align-items: flex-start !important;
@@ -305,22 +828,18 @@ html, body {
     cursor: default;
 }
 
-.edit-card:hover { background: #101040 !important; box-shadow: none; transform: none; }
-.edit-card:active { transform: none; background: #101040 !important; box-shadow: none; }
+.edit-card:hover  { background: rgba(8, 8, 38, 0.85) !important; box-shadow: none !important; transform: none !important; }
+.edit-card:active { transform: none !important; background: rgba(8, 8, 38, 0.85) !important; box-shadow: none !important; }
 
 .field-label {
     font-size: 0.85rem;
-    color: #add8e6;
+    color: rgba(173,216,230,0.72);
     margin-bottom: 6px;
     display: block;
 }
 
-.saber-input {
-    width: 100%;
-    color: #add8e6 !important;
-}
+.saber-input { width: 100%; color: #add8e6 !important; }
 
-/* Override MudBlazor input text colors */
 .saber-input .mud-input-root,
 .saber-input .mud-input input,
 .saber-input .mud-select-input {
@@ -329,10 +848,8 @@ html, body {
     font-size: 0.85rem;
 }
 
-/* ── Style editor ──────────────────────────────────────────── */
-.style-card {
-    min-width: 280px !important;
-}
+/* Style editor */
+.style-card { min-width: 280px !important; }
 
 .arg-row {
     display: flex;
@@ -345,17 +862,15 @@ html, body {
 .arg-label {
     flex: 0 0 140px;
     font-size: 0.78rem;
-    color: rgba(173,216,230,0.7);
+    color: rgba(173,216,230,0.62);
     word-break: break-word;
 }
 
-.arg-input {
-    flex: 1;
-}
+.arg-input { flex: 1; }
 
 .color-picker {
-    border: 1px solid #6060aa;
-    border-radius: 6px;
+    border: 1px solid rgba(96,96,170,0.48);
+    border-radius: 4px;
     background: none;
     height: 36px;
     width: 100px;
@@ -363,7 +878,7 @@ html, body {
     padding: 2px;
 }
 
-/* ── Variation editor ──────────────────────────────────────── */
+/* Variation editor */
 .variation-slider { width: 100%; }
 
 .variation-row {
@@ -377,11 +892,11 @@ html, body {
 
 .saber-icon-btn {
     color: #add8e6 !important;
-    border: 1px solid #6060aa;
-    border-radius: 8px !important;
+    border: 1px solid rgba(96,96,170,0.44) !important;
+    border-radius: 5px !important;
 }
 
-/* ── Settings ──────────────────────────────────────────────── */
+/* Settings rows */
 .setting-row {
     display: flex;
     align-items: center;
@@ -391,105 +906,14 @@ html, body {
 
 .setting-label { font-size: 0.85rem; }
 
-/* ── Snackbar / toast overrides ────────────────────────────── */
-.mud-snackbar {
-    font-family: sans-serif;
-}
+/* MudBlazor overrides */
+.mud-snackbar { font-family: sans-serif; }
+.mud-slider .mud-slider-track { background: rgba(96,96,170,0.70) !important; }
+.mud-switch-track { background-color: rgba(38,38,96,0.82) !important; }
 
-/* ── MudSlider track colour ─────────────────────────────────── */
-.mud-slider .mud-slider-track {
-    background: #6060aa !important;
-}
-
-/* ── MudSwitch colours ──────────────────────────────────────── */
-.mud-switch-track {
-    background-color: #303070 !important;
-}
-
-/* ── Known devices panel (connect page) ─────────────────────── */
-.known-devices {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    max-width: 320px;
-}
-
-.known-devices-title {
-    font-family: StarJedi, sans-serif;
-    font-size: 0.9rem;
-    color: rgba(173,216,230,0.55);
-    letter-spacing: 0.05em;
-}
-
-.known-devices-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    width: 100%;
-}
-
-.known-device-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-    background: #101040;
-    border: 1px solid #6060aa;
-    border-radius: 8px 24px;
-    padding: 5px 14px;
-    cursor: pointer;
-    transition: background-color 0.1s, transform 0.1s, box-shadow 0.1s;
-    text-align: left;
-}
-
-.known-device-row:hover {
-    background: #18185a;
-    box-shadow: 0 0 6px #6060aa66;
-}
-
-.known-device-row:active {
-    transform: scale(0.96);
-    box-shadow: 0 0 10px #6060aaaa;
-    background: #303080;
-}
-
-.known-device-row:disabled {
-    opacity: 0.5;
-    cursor: default;
-    pointer-events: none;
-}
-
-.device-type-badge {
-    font-family: StarJedi, sans-serif;
-    font-size: 0.75rem;
-    padding: 2px 8px;
-    border-radius: 6px;
-    flex-shrink: 0;
-}
-
-.badge-usb { background: #1a1a60; color: #add8e6; }
-.badge-ble { background: #1a1a60; color: #add8e6; }
-
-.known-devices-empty {
-    font-family: StarJedi, sans-serif;
-    font-size: 0.8rem;
-    color: rgba(173,216,230,0.35);
-    text-align: center;
-    padding: 4px 0;
-}
-
-.device-name {
-    font-size: 0.9rem;
-    color: #add8e6;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* ── Blazor error UI ────────────────────────────────────────── */
+/* Blazor error UI */
 #blazor-error-ui {
-    background: #2a0a10;
+    background: rgba(42,10,16,0.97);
     border-top: 1px solid #cf6679;
     bottom: 0;
     color: #ffb0ba;

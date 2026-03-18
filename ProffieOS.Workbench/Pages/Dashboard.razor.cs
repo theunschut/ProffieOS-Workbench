@@ -27,14 +27,8 @@ public partial class Dashboard : IDisposable
 
     private async Task OnVolumeChanged(int value)
     {
-        try
-        {
-            await State.SetVolumeAsync(value);
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"Volume error: {ex.Message}", Severity.Warning);
-        }
+        try { await State.SetVolumeAsync(value); }
+        catch (Exception ex) { Snackbar.Add($"Volume error: {ex.Message}", Severity.Warning); }
     }
 
     public void Dispose()

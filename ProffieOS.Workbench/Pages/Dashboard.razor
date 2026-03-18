@@ -10,7 +10,9 @@
 @if (Connection.State == ConnectionState.Disconnected)
 {
     <div class="connect-page">
-        <MudText Typo="Typo.h5" Class="starjedi-title mb-4">disconnected</MudText>
+        <div class="connect-logo">
+            <span class="starjedi-title">disconnected</span>
+        </div>
         <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="saber-btn"
                    OnClick="@(() => Nav.NavigateTo(""))">
             reconnect
@@ -19,7 +21,6 @@
     return;
 }
 
-<!-- Connection banner -->
 @if (Connection.State == ConnectionState.Reconnecting)
 {
     <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Class="reconnecting-banner">
@@ -27,41 +28,83 @@
     </MudAlert>
 }
 
-<!-- Header bar -->
-<div class="dashboard-header">
-    <div class="header-left">
-        <span class="starjedi-title appname">Proffieos Workbench</span>
-    </div>
-    <div class="header-center">
+<div class="app-shell">
+
+    <!-- ── Header ─────────────────────────────────────────── -->
+    <div class="app-header">
+        <span class="starjedi-title app-title">Proffieos Workbench</span>
+        <div class="header-spacer"></div>
         <div class="volume-row">
-            <MudText Typo="Typo.caption">Volume</MudText>
+            <MudIcon Icon="@Icons.Material.Filled.VolumeUp"
+                     Size="Size.Small"
+                     Style="color:rgba(173,216,230,0.48); flex-shrink:0;" />
             <MudSlider T="int" Value="State.Volume" ValueChanged="OnVolumeChanged"
                        Min="0" Max="2000" Class="volume-slider" />
-            <MudText Typo="Typo.caption" Style="min-width:3ch;">@State.Volume</MudText>
+            <MudText Typo="Typo.caption"
+                     Style="min-width:3.5ch; flex-shrink:0; opacity:0.50; font-family:monospace; font-size:0.7rem;">
+                @State.Volume
+            </MudText>
         </div>
-        <MudText Typo="Typo.caption">Battery: <strong>@State.BatteryVoltage V</strong></MudText>
-    </div>
-    <div class="header-right">
+        <MudChip T="string" Variant="Variant.Outlined" Size="Size.Small" Class="battery-chip"
+                 Icon="@Icons.Material.Filled.BatteryChargingFull"
+                 Style="font-family:monospace; font-size:0.68rem;">
+            @State.BatteryVoltage V
+        </MudChip>
         @if (State.HasEditMode)
         {
-            <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                           Class="mode-btn"
-                           title="Edit preset"
-                           OnClick="@(() => Nav.NavigateTo("edit"))" />
+            <MudTooltip Text="Edit Presets" Placement="Placement.Bottom" Delay="500">
+                <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                               Class="mode-btn"
+                               OnClick="@(() => Nav.NavigateTo("edit"))" />
+            </MudTooltip>
         }
         @if (State.HasSettings)
         {
-            <MudIconButton Icon="@Icons.Material.Filled.Settings"
-                           Class="mode-btn"
-                           title="Settings"
-                           OnClick="@(() => Nav.NavigateTo("settings"))" />
+            <MudTooltip Text="Settings" Placement="Placement.Bottom" Delay="500">
+                <MudIconButton Icon="@Icons.Material.Filled.Settings"
+                               Class="mode-btn"
+                               OnClick="@(() => Nav.NavigateTo("settings"))" />
+            </MudTooltip>
         }
     </div>
-</div>
 
-<!-- Main content -->
-<div class="dashboard-panels">
-    <PresetsPanel />
-    <TracksPanel />
-    <ControlsPanel />
+    <!-- ── Body: 3-panel grid ─────────────────────────────── -->
+    <div class="app-body">
+
+        <!-- Left: combat controls -->
+        <div class="controls-panel">
+            <div class="panel-label">
+                <span class="panel-label-text">controls</span>
+            </div>
+            <ControlsLayout />
+        </div>
+
+        <!-- Center: saber crystal + active preset name -->
+        <div class="center-display">
+            <div class="saber-image-wrap">
+                <img src="Lightsaber_Crystal.png" class="saber-image" alt="" />
+            </div>
+            @if (State.Presets.Count > 0
+                 && State.CurrentPresetIndex >= 0
+                 && State.CurrentPresetIndex < State.Presets.Count)
+            {
+                <div class="active-preset-card">
+                    <span class="active-preset-label">active preset</span>
+                    <span class="starjedi-title active-preset-name">
+                        @State.Presets[State.CurrentPresetIndex].Name.Replace("\\n", " ")
+                    </span>
+                </div>
+            }
+        </div>
+
+        <!-- Right: track list -->
+        <div class="info-panel">
+            <TracksPanel />
+        </div>
+
+    </div>
+
+    <!-- ── Footer: presets bar ────────────────────────────── -->
+    <PresetsBar />
+
 </div>

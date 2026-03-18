@@ -1,7 +1,11 @@
 @inject SaberStateService State
 
-<MudPaper Class="@($"saber-card control-card{(Active ? " active" : "")}")"
+<MudPaper Class="@($"control-btn{(Active ? " active" : "")}")"
           Elevation="0"
           @onclick="HandleClick">
-    <span class="starjedi-title card-title">@Label</span>
+    @if (!string.IsNullOrEmpty(Icon))
+    {
+        <MudIcon Icon="@Icon" Class="control-btn-icon" />
+    }
+    <span class="control-btn-label">@Label</span>
 </MudPaper>

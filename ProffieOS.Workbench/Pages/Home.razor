@@ -13,43 +13,49 @@
 
     @if (!Connection.BluetoothAvailable && !Connection.UsbAvailable)
     {
-        <MudAlert Severity="Severity.Error" Class="mt-4" Style="max-width:400px;">
+        <MudAlert Severity="Severity.Error" Style="max-width:440px;">
             This browser supports neither Web Bluetooth nor WebUSB.
             Use a Chromium-based browser (Chrome, Edge).
         </MudAlert>
     }
 
+    <div class="connect-section-divider">select connection protocol</div>
+
     <div class="connect-buttons">
         @if (Connection.UsbAvailable)
         {
-            <MudButton Variant="Variant.Outlined"
-                       Color="Color.Primary"
-                       Size="Size.Large"
-                       Class="saber-btn connect-btn"
-                       Disabled="_busy"
-                       OnClick="ConnectUsbAsync">
+            <div class="connect-card @(_busy ? "connect-card-busy" : "")"
+                 @onclick="ConnectUsbAsync">
                 @if (_busy && _connectingVia == "usb")
                 {
-                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                    <MudProgressCircular Size="Size.Large" Indeterminate="true" Color="Color.Primary" />
                 }
-                usb
-            </MudButton>
+                else
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.Usb" Class="connect-card-icon" />
+                }
+                <span class="connect-card-title">usb</span>
+                <span class="connect-card-sub">wired protocol</span>
+            </div>
         }
 
         @if (Connection.BluetoothAvailable)
         {
-            <MudButton Variant="Variant.Outlined"
-                       Color="Color.Primary"
-                       Size="Size.Large"
-                       Class="saber-btn connect-btn"
-                       Disabled="_busy"
-                       OnClick="TogglePasswordField">
-                ble
-            </MudButton>
+            <div class="connect-card @(_busy ? "connect-card-busy" : "")"
+                 @onclick="TogglePasswordField">
+                @if (_busy && _connectingVia == "ble")
+                {
+                    <MudProgressCircular Size="Size.Large" Indeterminate="true" Color="Color.Primary" />
+                }
+                else
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.Bluetooth" Class="connect-card-icon" />
+                }
+                <span class="connect-card-title">ble</span>
+                <span class="connect-card-sub">wireless protocol</span>
+            </div>
         }
     </div>
-
-    <KnownDevicesPanel Disabled="_busy" OnConnect="ConnectKnownAsync" />
 
     @if (_showPassword)
     {
@@ -73,4 +79,7 @@
             </MudButton>
         </div>
     }
+
+    <div class="connect-section-divider">previously paired</div>
+    <KnownDevicesPanel Disabled="_busy" OnConnect="ConnectKnownAsync" />
 </div>

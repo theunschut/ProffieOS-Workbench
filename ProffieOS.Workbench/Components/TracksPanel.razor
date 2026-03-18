@@ -3,19 +3,20 @@
 @implements IDisposable
 
 <div class="panel">
-    <div class="panel-header">
-        <span class="starjedi-title panel-title">Tracks</span>
+    <div class="panel-label">
+        <span class="panel-label-text">tracks</span>
     </div>
     <div class="panel-scroll">
         @if (!State.TrackList.Any())
         {
-            <MudText Typo="Typo.caption" Class="pa-4 mud-text-secondary">
+            <MudText Typo="Typo.caption" Class="pa-4"
+                     Style="color:rgba(173,216,230,0.40); font-family:sans-serif;">
                 Waiting for track list...
             </MudText>
         }
         else
         {
-            <div class="card-grid">
+            <MudList T="string" Dense="true" Style="background:transparent; padding:4px 0;">
                 @foreach (var track in State.TrackList)
                 {
                     if (track.Length <= 4) continue;
@@ -24,13 +25,21 @@
                     var title = parts[^1].Split('.')[0].ToLowerInvariant();
                     var isPlaying = t == State.CurrentTrack;
 
-                    <MudPaper Class="@($"saber-card track-card{(isPlaying ? " active" : "")}")"
-                              Elevation="0"
-                              @onclick="@(_ => PlayTrack(t))">
-                        <span class="starjedi-title card-title">@title</span>
-                    </MudPaper>
+                    <MudListItem T="string"
+                                 Class="@($"track-list-item{(isPlaying ? " active-track" : "")}")"
+                                 OnClick="@(async _ => await PlayTrack(t))">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <MudIcon Icon="@(isPlaying ? Icons.Material.Filled.PlayArrow : Icons.Material.Filled.MusicNote)"
+                                     Size="Size.Small"
+                                     Style="@($"color:{(isPlaying ? "#add8e6" : "rgba(173,216,230,0.40)")};")"/>
+                            <span class="starjedi-title"
+                                  style="font-size:0.80rem; @(isPlaying ? "text-shadow:0 0 8px rgba(96,144,220,0.5);" : "opacity:0.75;")">
+                                @title
+                            </span>
+                        </div>
+                    </MudListItem>
                 }
-            </div>
+            </MudList>
         }
     </div>
 </div>

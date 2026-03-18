@@ -9,7 +9,9 @@
 @if (Connection.State == ConnectionState.Disconnected)
 {
     <div class="connect-page">
-        <MudText Typo="Typo.h5" Class="starjedi-title mb-4">disconnected</MudText>
+        <div class="connect-logo">
+            <span class="starjedi-title">disconnected</span>
+        </div>
         <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="saber-btn"
                    OnClick="@(() => Nav.NavigateTo(""))">
             reconnect
@@ -18,18 +20,14 @@
     return;
 }
 
-<!-- Header bar -->
-<div class="dashboard-header">
-    <div class="header-left">
+<div class="app-header">
+    <MudTooltip Text="Back to dashboard" Placement="Placement.Bottom" Delay="400">
         <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
                        Class="mode-btn"
-                       title="Back to dashboard"
                        OnClick="@(() => Nav.NavigateTo("dashboard"))" />
-    </div>
-    <div class="header-center">
-        <span class="starjedi-title appname">Edit Preset</span>
-    </div>
-    <div class="header-right"></div>
+    </MudTooltip>
+    <span class="starjedi-title app-title">edit preset</span>
+    <div class="header-spacer"></div>
 </div>
 
 <div class="dashboard-panels edit-layout">

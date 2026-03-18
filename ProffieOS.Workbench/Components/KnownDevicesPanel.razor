@@ -1,24 +1,32 @@
 @inject IJSRuntime JS
 
-<div class="known-devices">
-    <div class="known-devices-title">known devices</div>
+<div class="known-devices-list">
     @if (_devices.Count == 0)
     {
-        <div class="known-devices-empty">none</div>
+        <div class="known-device-empty starjedi-title">none</div>
     }
     else
     {
-        <div class="known-devices-list">
+        <MudList T="string" Dense="true" Class="known-list">
             @foreach (var d in _devices)
             {
                 var device = d;
-                <button class="known-device-row" disabled="@Disabled" @onclick="() => OnConnect.InvokeAsync(device)">
-                    <span class="device-type-badge @(d.type == "ble" ? "badge-ble" : "badge-usb")">
-                        @d.type
-                    </span>
-                    <span class="device-name">@d.name</span>
-                </button>
+                <MudListItem T="string"
+                             Disabled="Disabled"
+                             Class="known-device-item"
+                             OnClick="@(async _ => await OnConnect.InvokeAsync(device))">
+                    <div class="known-device-content">
+                        <MudChip T="string"
+                                 Size="Size.Small"
+                                 Variant="Variant.Outlined"
+                                 Color="Color.Primary"
+                                 Class="known-device-chip">
+                            @d.type.ToLowerInvariant()
+                        </MudChip>
+                        <span class="known-device-name">@d.name.ToLowerInvariant()</span>
+                    </div>
+                </MudListItem>
             }
-        </div>
+        </MudList>
     }
 </div>

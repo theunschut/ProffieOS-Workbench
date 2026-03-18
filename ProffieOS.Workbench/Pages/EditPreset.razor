@@ -4,12 +4,12 @@
 @inject NavigationManager Nav
 @inject ISnackbar Snackbar
 
-<PageTitle>ProffieOS Workbench – Edit</PageTitle>
+<PageTitle>proffieos workbench – edit</PageTitle>
 
 @if (Connection.State == ConnectionState.Disconnected)
 {
-    <div class="connect-page">
-        <MudText Typo="Typo.h5" Class="starjedi-title mb-4">disconnected</MudText>
+    <div class="status-shell panel-surface">
+        <h1 class="starjedi-title status-title">disconnected</h1>
         <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="saber-btn"
                    OnClick="@(() => Nav.NavigateTo(""))">
             reconnect
@@ -18,21 +18,21 @@
     return;
 }
 
-<!-- Header bar -->
-<div class="dashboard-header">
-    <div class="header-left">
-        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
-                       Class="mode-btn"
-                       title="Back to dashboard"
-                       OnClick="@(() => Nav.NavigateTo("dashboard"))" />
-    </div>
-    <div class="header-center">
-        <span class="starjedi-title appname">Edit Preset</span>
-    </div>
-    <div class="header-right"></div>
-</div>
+<div class="page-shell">
+    <header class="topbar panel-surface">
+        <MudTooltip Text="back to dashboard" Placement="Placement.Bottom" Delay="400">
+            <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                           Class="deck-icon-btn"
+                           OnClick="@(() => Nav.NavigateTo("dashboard"))" />
+        </MudTooltip>
+        <div class="topbar-brand">
+            <p class="eyebrow">preset workshop</p>
+            <span class="starjedi-title wb-title">edit presets</span>
+        </div>
+    </header>
 
-<div class="dashboard-panels edit-layout">
-    <PresetsPanel Mode="@("Edit")" />
-    <EditPanel />
+    <div class="editor-layout">
+        <PresetsPanel Mode="@("Edit")" />
+        <EditPanel />
+    </div>
 </div>

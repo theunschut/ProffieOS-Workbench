@@ -4,73 +4,88 @@
 @inject NavigationManager Nav
 @inject ISnackbar Snackbar
 
-<PageTitle>ProffieOS Workbench</PageTitle>
+<PageTitle>proffieos workbench</PageTitle>
 
-<div class="connect-page">
-    <div class="connect-logo">
-        <span class="starjedi-title">Proffieos<br />Workbench</span>
-    </div>
+<div class="landing-shell">
+    <section class="landing-intro panel-surface">
+        <p class="eyebrow">proffieboard configuration interface</p>
+        <h1 class="starjedi-title landing-title">proffieos<br />workbench</h1>
+        <p class="landing-copy">
+            connect to your saber and manage presets, tracks, styles, and gestures from a streamlined command console.
+        </p>
 
-    @if (!Connection.BluetoothAvailable && !Connection.UsbAvailable)
-    {
-        <MudAlert Severity="Severity.Error" Class="mt-4" Style="max-width:400px;">
-            This browser supports neither Web Bluetooth nor WebUSB.
-            Use a Chromium-based browser (Chrome, Edge).
-        </MudAlert>
-    }
-
-    <div class="connect-buttons">
-        @if (Connection.UsbAvailable)
+        @if (!Connection.BluetoothAvailable && !Connection.UsbAvailable)
         {
-            <MudButton Variant="Variant.Outlined"
-                       Color="Color.Primary"
-                       Size="Size.Large"
-                       Class="saber-btn connect-btn"
-                       Disabled="_busy"
-                       OnClick="ConnectUsbAsync">
-                @if (_busy && _connectingVia == "usb")
-                {
-                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
-                }
-                usb
-            </MudButton>
+            <MudAlert Severity="Severity.Error" Class="landing-alert">
+                this browser supports neither web bluetooth nor webusb.
+                use a chromium-based browser (chrome, edge).
+            </MudAlert>
         }
+    </section>
 
-        @if (Connection.BluetoothAvailable)
-        {
-            <MudButton Variant="Variant.Outlined"
-                       Color="Color.Primary"
-                       Size="Size.Large"
-                       Class="saber-btn connect-btn"
-                       Disabled="_busy"
-                       OnClick="TogglePasswordField">
-                ble
-            </MudButton>
-        }
-    </div>
-
-    <KnownDevicesPanel Disabled="_busy" OnConnect="ConnectKnownAsync" />
-
-    @if (_showPassword)
-    {
-        <div class="password-area">
-            <MudTextField @bind-Value="_password"
-                          Label="Password (optional)"
-                          InputType="InputType.Password"
-                          Variant="Variant.Outlined"
-                          Class="password-field"
-                          OnKeyDown="OnPasswordKeyDown" />
-            <MudButton Variant="Variant.Outlined"
-                       Color="Color.Primary"
-                       Class="saber-btn"
-                       Disabled="_busy"
-                       OnClick="ConnectBleAsync">
-                @if (_busy && _connectingVia == "ble")
-                {
-                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
-                }
-                connect
-            </MudButton>
+    <section class="landing-connect panel-surface">
+        <div class="panel-topline">
+            <span class="panel-dot"></span>
+            <span class="panel-topline-text">connection protocol</span>
         </div>
-    }
+
+        <div class="protocol-grid">
+            @if (Connection.UsbAvailable)
+            {
+                <button class="protocol-tile @(_busy ? "is-busy" : "")" @onclick="ConnectUsbAsync" type="button">
+                    <MudIcon Icon="@Icons.Material.Filled.Usb" Class="protocol-icon" />
+                    <span class="starjedi-title protocol-name">usb</span>
+                    <span class="protocol-meta">wired</span>
+                    @if (_busy && _connectingVia == "usb")
+                    {
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="protocol-loader" />
+                    }
+                </button>
+            }
+
+            @if (Connection.BluetoothAvailable)
+            {
+                <button class="protocol-tile @(_busy ? "is-busy" : "")" @onclick="TogglePasswordField" type="button">
+                    <MudIcon Icon="@Icons.Material.Filled.Bluetooth" Class="protocol-icon" />
+                    <span class="starjedi-title protocol-name">ble</span>
+                    <span class="protocol-meta">wireless</span>
+                    @if (_busy && _connectingVia == "ble")
+                    {
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="protocol-loader" />
+                    }
+                </button>
+            }
+        </div>
+
+        @if (_showPassword)
+        {
+            <div class="password-dock">
+                <MudTextField @bind-Value="_password"
+                              Label="password (optional)"
+                              InputType="InputType.Password"
+                              Variant="Variant.Outlined"
+                              Class="password-field"
+                              OnKeyDown="OnPasswordKeyDown" />
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           Class="saber-btn"
+                           Disabled="_busy"
+                           OnClick="ConnectBleAsync">
+                    @if (_busy && _connectingVia == "ble")
+                    {
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                    }
+                    connect
+                </MudButton>
+            </div>
+        }
+
+        <div class="known-devices-wrap">
+            <div class="panel-topline">
+                <span class="panel-dot"></span>
+                <span class="panel-topline-text">known devices</span>
+            </div>
+            <KnownDevicesPanel Disabled="_busy" OnConnect="ConnectKnownAsync" />
+        </div>
+    </section>
 </div>

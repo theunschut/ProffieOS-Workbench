@@ -2,9 +2,10 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<div class="panel presets-panel">
-    <div class="panel-header">
-        <span class="starjedi-title panel-title">Presets</span>
+<div class="panel work-panel presets-panel">
+    <div class="panel-topline">
+        <span class="panel-dot"></span>
+        <span class="panel-topline-text">presets</span>
     </div>
     <div class="panel-scroll">
         <div class="card-grid">
@@ -14,7 +15,7 @@
                 var preset = State.Presets[i];
                 var isActive = idx == State.CurrentPresetIndex;
 
-                <MudPaper Class="@($"saber-card preset-card{(isActive ? " active" : "")}")"
+                <MudPaper Class="@($"preset-chip panel-chip{(isActive ? " is-active" : "")}")"
                           Elevation="0"
                           draggable="@(IsEditMode ? "true" : "false")"
                           @ondragstart="@(_ => StartDrag(idx))"
@@ -22,24 +23,24 @@
                           @ondragover:preventDefault="true"
                           @onclick="@(_ => SelectPreset(idx))"
                           @ondblclick="@(_ => { if (IsEditMode) EditPreset(idx); })">
-                    <span class="starjedi-title card-title">@preset.Name.Replace("\\n", "\n")</span>
+                    <span class="starjedi-title preset-name">@preset.Name.Replace("\\n", "\n").ToLowerInvariant()</span>
                 </MudPaper>
             }
 
             @if (IsEditMode)
             {
-                <MudPaper Class="saber-card preset-card action-card"
+                <MudPaper Class="preset-chip panel-chip action-chip"
                           Elevation="0"
                           @onclick="AddPreset">
-                    <span class="card-symbol">+</span>
+                    <span class="chip-symbol">+</span>
                 </MudPaper>
 
-                <MudPaper Class="saber-card preset-card action-card danger-card"
+                <MudPaper Class="preset-chip panel-chip action-chip danger-chip"
                           Elevation="0"
                           @ondrop="DropDelete"
                           @ondragover:preventDefault="true"
                           @onclick="ConfirmDelete">
-                    <span class="card-symbol">🗑</span>
+                    <span class="chip-symbol">🗑</span>
                 </MudPaper>
             }
         </div>

@@ -2,20 +2,21 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<div class="panel">
-    <div class="panel-header">
-        <span class="starjedi-title panel-title">Tracks</span>
+<div class="panel work-panel">
+    <div class="panel-topline">
+        <span class="panel-dot"></span>
+        <span class="panel-topline-text">tracks</span>
     </div>
     <div class="panel-scroll">
         @if (!State.TrackList.Any())
         {
-            <MudText Typo="Typo.caption" Class="pa-4 mud-text-secondary">
-                Waiting for track list...
+            <MudText Typo="Typo.caption" Class="empty-state-note">
+                waiting for track list...
             </MudText>
         }
         else
         {
-            <div class="card-grid">
+            <MudList T="string" Dense="true" Class="track-list">
                 @foreach (var track in State.TrackList)
                 {
                     if (track.Length <= 4) continue;
@@ -24,13 +25,20 @@
                     var title = parts[^1].Split('.')[0].ToLowerInvariant();
                     var isPlaying = t == State.CurrentTrack;
 
-                    <MudPaper Class="@($"saber-card track-card{(isPlaying ? " active" : "")}")"
-                              Elevation="0"
-                              @onclick="@(_ => PlayTrack(t))">
-                        <span class="starjedi-title card-title">@title</span>
-                    </MudPaper>
+                    <MudListItem T="string"
+                                 Class="@($"track-list-item{(isPlaying ? " active-track" : "")}")"
+                                 OnClick="@(async _ => await PlayTrack(t))">
+                        <div class="track-row">
+                            <MudIcon Icon="@(isPlaying ? Icons.Material.Filled.PlayArrow : Icons.Material.Filled.MusicNote)"
+                                     Size="Size.Small"
+                                     Class="@(isPlaying ? "track-icon playing" : "track-icon")" />
+                            <span class="starjedi-title track-name @(isPlaying ? "is-playing" : "")">
+                                @title
+                            </span>
+                        </div>
+                    </MudListItem>
                 }
-            </div>
+            </MudList>
         }
     </div>
 </div>

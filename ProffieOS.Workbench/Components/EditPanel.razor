@@ -2,65 +2,66 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<div class="panel edit-panel">
-    <div class="panel-header">
-        <span class="starjedi-title panel-title">Edit</span>
+<div class="panel work-panel edit-panel">
+    <div class="panel-topline">
+        <span class="panel-dot"></span>
+        <span class="panel-topline-text">edit preset</span>
     </div>
 
     @if (_preset is null)
     {
-        <MudText Class="pa-4 mud-text-secondary">Select a preset to edit.</MudText>
+        <MudText Class="pa-4 mud-text-secondary">select a preset to edit.</MudText>
         return;
     }
 
-    <div class="panel-scroll">
-        <div class="edit-fields edit-grid">
+    <div class="edit-content">
+        <div class="edit-column-scroll edit-column-left">
+            <div class="edit-column-grid">
+                <MudPaper Class="field-card" Elevation="0">
+                    <MudText Typo="Typo.caption" Class="field-label starjedi-title">name</MudText>
+                    <MudTextField @bind-Value="_name"
+                                  Variant="Variant.Outlined"
+                                  Class="saber-input"
+                                  OnBlur="SaveName" />
+                </MudPaper>
 
-            <!-- Name -->
-            <MudPaper Class="saber-card edit-card" Elevation="0">
-                <MudText Typo="Typo.caption" Class="field-label starjedi-title">name</MudText>
-                <MudTextField @bind-Value="_name"
-                              Variant="Variant.Outlined"
-                              Class="saber-input"
-                              OnBlur="SaveName" />
-            </MudPaper>
+                <MudPaper Class="field-card" Elevation="0">
+                    <MudText Typo="Typo.caption" Class="field-label starjedi-title">font</MudText>
+                    <MudSelect T="string" Value="_font"
+                               Variant="Variant.Outlined"
+                               Class="saber-input"
+                               ValueChanged="SaveFont">
+                        @foreach (var f in State.FontList)
+                        {
+                            <MudSelectItem T="string" Value="@f">@f.ToLowerInvariant()</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudPaper>
 
-            <!-- Font -->
-            <MudPaper Class="saber-card edit-card" Elevation="0">
-                <MudText Typo="Typo.caption" Class="field-label starjedi-title">font</MudText>
-                <MudSelect T="string" Value="_font"
-                           Variant="Variant.Outlined"
-                           Class="saber-input"
-                           ValueChanged="SaveFont">
-                    @foreach (var f in State.FontList)
-                    {
-                        <MudSelectItem T="string" Value="@f">@f.ToLowerInvariant()</MudSelectItem>
-                    }
-                </MudSelect>
-            </MudPaper>
+                <MudPaper Class="field-card" Elevation="0">
+                    <MudText Typo="Typo.caption" Class="field-label starjedi-title">track</MudText>
+                    <MudSelect T="string" Value="_track"
+                               Variant="Variant.Outlined"
+                               Class="saber-input"
+                               ValueChanged="SaveTrack">
+                        @foreach (var t in State.TrackList)
+                        {
+                            <MudSelectItem T="string" Value="@t">@t.ToLowerInvariant()</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudPaper>
 
-            <!-- Track -->
-            <MudPaper Class="saber-card edit-card" Elevation="0">
-                <MudText Typo="Typo.caption" Class="field-label starjedi-title">track</MudText>
-                <MudSelect T="string" Value="_track"
-                           Variant="Variant.Outlined"
-                           Class="saber-input"
-                           ValueChanged="SaveTrack">
-                    @foreach (var t in State.TrackList)
-                    {
-                        <MudSelectItem T="string" Value="@t">@t.ToLowerInvariant()</MudSelectItem>
-                    }
-                </MudSelect>
-            </MudPaper>
+                <VariationEditor PresetIndex="State.CurrentPresetIndex" />
+            </div>
+        </div>
 
-            @foreach (var (blade, style) in _preset.Styles)
-            {
-                <StyleEditor Blade="blade" StyleValue="@style" PresetIndex="State.CurrentPresetIndex" />
-            }
-
-            <!-- Variation -->
-            <VariationEditor PresetIndex="State.CurrentPresetIndex" />
-
+        <div class="edit-column-scroll edit-column-right">
+            <div class="edit-column-grid">
+                @foreach (var (blade, style) in _preset.Styles)
+                {
+                    <StyleEditor Blade="blade" StyleValue="@style" PresetIndex="State.CurrentPresetIndex" />
+                }
+            </div>
         </div>
     </div>
 </div>

@@ -5,6 +5,7 @@ namespace ProffieOS.Workbench.Components;
 public partial class ControlButton
 {
     [Parameter, EditorRequired] public string Label { get; set; } = "";
+    [Parameter] public string Icon { get; set; } = "";
     [Parameter] public bool Active { get; set; }
     [Parameter] public Func<Task>? OnClick { get; set; }
 

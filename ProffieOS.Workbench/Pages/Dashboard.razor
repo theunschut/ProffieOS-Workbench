@@ -5,12 +5,12 @@
 @inject NavigationManager Nav
 @inject ISnackbar Snackbar
 
-<PageTitle>ProffieOS Workbench</PageTitle>
+<PageTitle>proffieos workbench</PageTitle>
 
 @if (Connection.State == ConnectionState.Disconnected)
 {
-    <div class="connect-page">
-        <MudText Typo="Typo.h5" Class="starjedi-title mb-4">disconnected</MudText>
+    <div class="status-shell panel-surface">
+        <h1 class="starjedi-title status-title">disconnected</h1>
         <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="saber-btn"
                    OnClick="@(() => Nav.NavigateTo(""))">
             reconnect
@@ -19,49 +19,115 @@
     return;
 }
 
-<!-- Connection banner -->
-@if (Connection.State == ConnectionState.Reconnecting)
-{
-    <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Class="reconnecting-banner">
-        Reconnecting... please wait
-    </MudAlert>
-}
+<div class="app-shell">
+    @if (Connection.State == ConnectionState.Reconnecting)
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Class="reconnecting-banner">
+            reconnecting... please wait
+        </MudAlert>
+    }
 
-<!-- Header bar -->
-<div class="dashboard-header">
-    <div class="header-left">
-        <span class="starjedi-title appname">Proffieos Workbench</span>
-    </div>
-    <div class="header-center">
-        <div class="volume-row">
-            <MudText Typo="Typo.caption">Volume</MudText>
-            <MudSlider T="int" Value="State.Volume" ValueChanged="OnVolumeChanged"
-                       Min="0" Max="2000" Class="volume-slider" />
-            <MudText Typo="Typo.caption" Style="min-width:3ch;">@State.Volume</MudText>
+    <header class="topbar panel-surface">
+        <div class="topbar-brand">
+            <p class="eyebrow">active console</p>
+            <span class="starjedi-title wb-title">proffieos workbench</span>
         </div>
-        <MudText Typo="Typo.caption">Battery: <strong>@State.BatteryVoltage V</strong></MudText>
-    </div>
-    <div class="header-right">
-        @if (State.HasEditMode)
-        {
-            <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                           Class="mode-btn"
-                           title="Edit preset"
-                           OnClick="@(() => Nav.NavigateTo("edit"))" />
-        }
-        @if (State.HasSettings)
-        {
-            <MudIconButton Icon="@Icons.Material.Filled.Settings"
-                           Class="mode-btn"
-                           title="Settings"
-                           OnClick="@(() => Nav.NavigateTo("settings"))" />
-        }
-    </div>
-</div>
 
-<!-- Main content -->
-<div class="dashboard-panels">
-    <PresetsPanel />
-    <TracksPanel />
-    <ControlsPanel />
+        <div class="topbar-metrics">
+            <div class="volume-block">
+                <MudIcon Icon="@Icons.Material.Filled.VolumeUp" Size="Size.Small" Class="volume-icon" />
+                <MudSlider T="int" Value="State.Volume" ValueChanged="OnVolumeChanged" Min="0" Max="2000" Class="volume-slider" />
+                <span class="volume-value">@State.Volume</span>
+            </div>
+
+            <MudChip T="string" Variant="Variant.Outlined" Size="Size.Small" Class="status-chip"
+                     Icon="@Icons.Material.Filled.BatteryChargingFull">
+                @State.BatteryVoltage v
+            </MudChip>
+
+            @if (State.HasEditMode)
+            {
+                <MudTooltip Text="toggle edit" Placement="Placement.Bottom" Delay="500">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                   Class="@($"deck-icon-btn topbar-action{(IsEditView ? " is-active" : "")}")"
+                                   OnClick="ToggleEditView" />
+                </MudTooltip>
+            }
+            @if (State.HasSettings)
+            {
+                <MudTooltip Text="toggle settings" Placement="Placement.Bottom" Delay="500">
+                    <MudIconButton Icon="@Icons.Material.Filled.Settings"
+                                   Class="@($"deck-icon-btn topbar-action{(IsSettingsView ? " is-active" : "")}")"
+                                   OnClick="ToggleSettingsView" />
+                </MudTooltip>
+            }
+        </div>
+    </header>
+
+    <div class="dashboard-grid">
+        <aside class="dashboard-panel">
+            <div class="panel-topline">
+                <span class="panel-dot"></span>
+                <span class="panel-topline-text">combat deck</span>
+            </div>
+            <ControlsLayout />
+        </aside>
+
+        <main class="@($"dashboard-center panel-surface{(HasCenterOverlay ? " has-overlay" : "")}")">
+            @if (IsEditView)
+            {
+                <div class="center-workspace">
+                    <EditPanel />
+                </div>
+            }
+            else if (IsSettingsView)
+            {
+                <div class="center-workspace">
+                    @if (_isSettingsLoading)
+                    {
+                        <div class="loading-wrap panel-surface">
+                            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+                        </div>
+                    }
+                    else
+                    {
+                        <SettingsPanel />
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="eyebrow">current preset</p>
+                <div class="reticle">
+                    <div class="arc-outer"></div>
+                    <div class="arc-inner"></div>
+                    <span class="r-mark r-n"></span>
+                    <span class="r-mark r-e"></span>
+                    <span class="r-mark r-s"></span>
+                    <span class="r-mark r-w"></span>
+                    <div class="reticle-core">
+                        @if (State.Presets.Count > 0
+                             && State.CurrentPresetIndex >= 0
+                             && State.CurrentPresetIndex < State.Presets.Count)
+                        {
+                            <span class="r-sub">active preset</span>
+                            <span class="starjedi-title r-title">
+                                @State.Presets[State.CurrentPresetIndex].Name.Replace("\\n", " ").ToLowerInvariant()
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="r-sub">loading</span>
+                        }
+                    </div>
+                </div>
+            }
+        </main>
+
+        <aside class="dashboard-panel">
+            <TracksPanel />
+        </aside>
+    </div>
+
+    <PresetsBar Mode="@(IsEditView ? "Edit" : "Normal")" />
 </div>

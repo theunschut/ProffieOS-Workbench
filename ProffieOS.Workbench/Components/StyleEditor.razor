@@ -1,7 +1,7 @@
 @inject SaberStateService State
 @inject ISnackbar Snackbar
 
-<MudPaper Class="saber-card edit-card style-card" Elevation="0">
+<MudPaper Class="field-card style-card" Elevation="0">
     <MudText Typo="Typo.caption" Class="field-label starjedi-title">style @Blade</MudText>
 
     <MudSelect T="string" Value="_selectedStyle"
@@ -23,7 +23,7 @@
             var idx = i;
 
             <div class="arg-row">
-                <MudText Typo="Typo.caption" Class="arg-label">@GetArgLabel(arg, idx)</MudText>
+                <MudText Typo="Typo.caption" Class="arg-label">@GetArgLabel(arg, idx).ToLowerInvariant()</MudText>
 
                 @if (arg.Type == "COLOR")
                 {

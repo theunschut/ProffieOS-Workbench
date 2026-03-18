@@ -15,7 +15,7 @@
                 <MudListItem T="string"
                              Disabled="Disabled"
                              OnClick="@(async _ => await OnConnect.InvokeAsync(device))"
-                             Style="border:1px solid rgba(96,96,170,0.38); border-radius:8px 24px; margin:3px 0; background:rgba(12,12,52,0.65); padding:6px 14px;">
+                             Style="border:1px solid rgba(26,100,180,0.30); border-radius:4px 20px; margin:3px 0; background:rgba(3,10,30,0.88); padding:6px 14px;">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <MudChip T="string"
                                  Size="Size.Small"
@@ -24,7 +24,7 @@
                                  Style="font-family:StarJedi,sans-serif; font-size:0.68rem; height:20px; min-width:36px;">
                             @d.type
                         </MudChip>
-                        <span style="font-size:0.88rem; color:#add8e6; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">@d.name</span>
+                        <span style="font-size:0.88rem; color:#c0dcff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">@d.name</span>
                     </div>
                 </MudListItem>
             }

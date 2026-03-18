@@ -37,11 +37,11 @@
         <div class="volume-row">
             <MudIcon Icon="@Icons.Material.Filled.VolumeUp"
                      Size="Size.Small"
-                     Style="color:rgba(173,216,230,0.48); flex-shrink:0;" />
+                     Style="color:rgba(180,215,248,0.48); flex-shrink:0;" />
             <MudSlider T="int" Value="State.Volume" ValueChanged="OnVolumeChanged"
                        Min="0" Max="2000" Class="volume-slider" />
             <MudText Typo="Typo.caption"
-                     Style="min-width:3.5ch; flex-shrink:0; opacity:0.50; font-family:monospace; font-size:0.7rem;">
+                     Style="min-width:3.5ch; flex-shrink:0; opacity:0.48; font-family:monospace; font-size:0.7rem;">
                 @State.Volume
             </MudText>
         </div>

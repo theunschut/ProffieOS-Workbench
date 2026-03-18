@@ -10,7 +10,7 @@
         @if (!State.TrackList.Any())
         {
             <MudText Typo="Typo.caption" Class="pa-4"
-                     Style="color:rgba(173,216,230,0.40); font-family:sans-serif;">
+                     Style="color:rgba(180,215,248,0.38); font-family:sans-serif;">
                 Waiting for track list...
             </MudText>
         }
@@ -31,9 +31,9 @@
                         <div style="display:flex; align-items:center; gap:10px;">
                             <MudIcon Icon="@(isPlaying ? Icons.Material.Filled.PlayArrow : Icons.Material.Filled.MusicNote)"
                                      Size="Size.Small"
-                                     Style="@($"color:{(isPlaying ? "#add8e6" : "rgba(173,216,230,0.40)")};")"/>
+                                     Style="@($"color:{(isPlaying ? "#c0dcff" : "rgba(180,215,248,0.38)")};")"/>
                             <span class="starjedi-title"
-                                  style="font-size:0.80rem; @(isPlaying ? "text-shadow:0 0 8px rgba(96,144,220,0.5);" : "opacity:0.75;")">
+                                  style="font-size:0.80rem; @(isPlaying ? "text-shadow:0 0 10px rgba(26,163,255,0.55);" : "opacity:0.72;")">
                                 @title
                             </span>
                         </div>

@@ -5,14 +5,12 @@
 @inject NavigationManager Nav
 @inject ISnackbar Snackbar
 
-<PageTitle>ProffieOS Workbench</PageTitle>
+<PageTitle>proffieos workbench</PageTitle>
 
 @if (Connection.State == ConnectionState.Disconnected)
 {
-    <div class="hs-screen">
-        <div class="hs-brand">
-            <span class="starjedi-title hs-title">disconnected</span>
-        </div>
+    <div class="status-shell panel-surface">
+        <h1 class="starjedi-title status-title">disconnected</h1>
         <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="saber-btn"
                    OnClick="@(() => Nav.NavigateTo(""))">
             reconnect
@@ -21,95 +19,115 @@
     return;
 }
 
-@if (Connection.State == ConnectionState.Reconnecting)
-{
-    <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Class="reconnecting-banner">
-        Reconnecting... please wait
-    </MudAlert>
-}
+<div class="app-shell">
+    @if (Connection.State == ConnectionState.Reconnecting)
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Class="reconnecting-banner">
+            reconnecting... please wait
+        </MudAlert>
+    }
 
-<div class="wb-shell">
-
-    <!-- ── Header ──────────────────────────────────────────── -->
-    <header class="wb-header">
-        <span class="starjedi-title wb-title">Proffieos Workbench</span>
-        <div class="wb-header-spacer"></div>
-        <div class="wb-vol">
-            <MudIcon Icon="@Icons.Material.Filled.VolumeUp"
-                     Size="Size.Small"
-                     Style="color:rgba(176,216,248,0.45); flex-shrink:0;" />
-            <MudSlider T="int" Value="State.Volume" ValueChanged="OnVolumeChanged"
-                       Min="0" Max="2000" Class="wb-vol-slider" />
-            <span class="wb-vol-val">@State.Volume</span>
+    <header class="topbar panel-surface">
+        <div class="topbar-brand">
+            <p class="eyebrow">active console</p>
+            <span class="starjedi-title wb-title">proffieos workbench</span>
         </div>
-        <MudChip T="string" Variant="Variant.Outlined" Size="Size.Small" Class="wb-battery"
-                 Icon="@Icons.Material.Filled.BatteryChargingFull">
-            @State.BatteryVoltage V
-        </MudChip>
-        @if (State.HasEditMode)
-        {
-            <MudTooltip Text="Edit Presets" Placement="Placement.Bottom" Delay="500">
-                <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                               Class="wb-icon-btn"
-                               OnClick="@(() => Nav.NavigateTo("edit"))" />
-            </MudTooltip>
-        }
-        @if (State.HasSettings)
-        {
-            <MudTooltip Text="Settings" Placement="Placement.Bottom" Delay="500">
-                <MudIconButton Icon="@Icons.Material.Filled.Settings"
-                               Class="wb-icon-btn"
-                               OnClick="@(() => Nav.NavigateTo("settings"))" />
-            </MudTooltip>
-        }
+
+        <div class="topbar-metrics">
+            <div class="volume-block">
+                <MudIcon Icon="@Icons.Material.Filled.VolumeUp" Size="Size.Small" Class="volume-icon" />
+                <MudSlider T="int" Value="State.Volume" ValueChanged="OnVolumeChanged" Min="0" Max="2000" Class="volume-slider" />
+                <span class="volume-value">@State.Volume</span>
+            </div>
+
+            <MudChip T="string" Variant="Variant.Outlined" Size="Size.Small" Class="status-chip"
+                     Icon="@Icons.Material.Filled.BatteryChargingFull">
+                @State.BatteryVoltage v
+            </MudChip>
+
+            @if (State.HasEditMode)
+            {
+                <MudTooltip Text="toggle edit" Placement="Placement.Bottom" Delay="500">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                   Class="@($"deck-icon-btn topbar-action{(IsEditView ? " is-active" : "")}")"
+                                   OnClick="ToggleEditView" />
+                </MudTooltip>
+            }
+            @if (State.HasSettings)
+            {
+                <MudTooltip Text="toggle settings" Placement="Placement.Bottom" Delay="500">
+                    <MudIconButton Icon="@Icons.Material.Filled.Settings"
+                                   Class="@($"deck-icon-btn topbar-action{(IsSettingsView ? " is-active" : "")}")"
+                                   OnClick="ToggleSettingsView" />
+                </MudTooltip>
+            }
+        </div>
     </header>
 
-    <!-- ── Body: 3 columns ─────────────────────────────────── -->
-    <div class="wb-body">
-
-        <!-- Left: combat controls -->
-        <aside class="wb-left">
-            <div class="wb-pane-hdr">
-                <span class="starjedi-title wb-pane-label">combat</span>
+    <div class="dashboard-grid">
+        <aside class="dashboard-panel">
+            <div class="panel-topline">
+                <span class="panel-dot"></span>
+                <span class="panel-topline-text">combat deck</span>
             </div>
             <ControlsLayout />
         </aside>
 
-        <!-- Center: targeting reticle + active preset -->
-        <main class="wb-center">
-            <div class="reticle">
-                <div class="arc-outer"></div>
-                <div class="arc-inner"></div>
-                <span class="r-mark r-n"></span>
-                <span class="r-mark r-e"></span>
-                <span class="r-mark r-s"></span>
-                <span class="r-mark r-w"></span>
-                <div class="reticle-core">
-                    @if (State.Presets.Count > 0
-                         && State.CurrentPresetIndex >= 0
-                         && State.CurrentPresetIndex < State.Presets.Count)
+        <main class="@($"dashboard-center panel-surface{(HasCenterOverlay ? " has-overlay" : "")}")">
+            @if (IsEditView)
+            {
+                <div class="center-workspace">
+                    <EditPanel />
+                </div>
+            }
+            else if (IsSettingsView)
+            {
+                <div class="center-workspace">
+                    @if (_isSettingsLoading)
                     {
-                        <span class="r-sub">active preset</span>
-                        <span class="starjedi-title r-title">
-                            @State.Presets[State.CurrentPresetIndex].Name.Replace("\\n", " ")
-                        </span>
+                        <div class="loading-wrap panel-surface">
+                            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+                        </div>
                     }
                     else
                     {
-                        <span class="r-sub">loading</span>
+                        <SettingsPanel />
                     }
                 </div>
-            </div>
+            }
+            else
+            {
+                <p class="eyebrow">current preset</p>
+                <div class="reticle">
+                    <div class="arc-outer"></div>
+                    <div class="arc-inner"></div>
+                    <span class="r-mark r-n"></span>
+                    <span class="r-mark r-e"></span>
+                    <span class="r-mark r-s"></span>
+                    <span class="r-mark r-w"></span>
+                    <div class="reticle-core">
+                        @if (State.Presets.Count > 0
+                             && State.CurrentPresetIndex >= 0
+                             && State.CurrentPresetIndex < State.Presets.Count)
+                        {
+                            <span class="r-sub">active preset</span>
+                            <span class="starjedi-title r-title">
+                                @State.Presets[State.CurrentPresetIndex].Name.Replace("\\n", " ").ToLowerInvariant()
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="r-sub">loading</span>
+                        }
+                    </div>
+                </div>
+            }
         </main>
 
-        <!-- Right: track list -->
-        <aside class="wb-right">
+        <aside class="dashboard-panel">
             <TracksPanel />
         </aside>
-
     </div>
 
-    <!-- ── Footer: presets bar ─────────────────────────────── -->
-    <PresetsBar />
-
+    <PresetsBar Mode="@(IsEditView ? "Edit" : "Normal")" />
 </div>

@@ -1,30 +1,29 @@
 @inject IJSRuntime JS
 
-<div class="hs-known">
-    <div class="hs-known-title">known devices</div>
+<div class="known-devices-list">
     @if (_devices.Count == 0)
     {
-        <div class="hs-known-empty">none</div>
+        <div class="known-device-empty starjedi-title">none</div>
     }
     else
     {
-        <MudList T="string" Dense="true" Style="background:transparent; width:100%; padding:0;">
+        <MudList T="string" Dense="true" Class="known-list">
             @foreach (var d in _devices)
             {
                 var device = d;
                 <MudListItem T="string"
                              Disabled="Disabled"
-                             OnClick="@(async _ => await OnConnect.InvokeAsync(device))"
-                             Style="border:1px solid rgba(0,155,215,0.28); border-radius:4px 18px; margin:3px 0; background:rgba(0,14,34,0.90); padding:6px 14px;">
-                    <div style="display:flex; align-items:center; gap:10px;">
+                             Class="known-device-item"
+                             OnClick="@(async _ => await OnConnect.InvokeAsync(device))">
+                    <div class="known-device-content">
                         <MudChip T="string"
                                  Size="Size.Small"
                                  Variant="Variant.Outlined"
                                  Color="Color.Primary"
-                                 Style="font-family:StarJedi,sans-serif; font-size:0.68rem; height:20px; min-width:36px;">
-                            @d.type
+                                 Class="known-device-chip">
+                            @d.type.ToLowerInvariant()
                         </MudChip>
-                        <span style="font-size:0.88rem; color:#b0d8f8; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">@d.name</span>
+                        <span class="known-device-name">@d.name.ToLowerInvariant()</span>
                     </div>
                 </MudListItem>
             }

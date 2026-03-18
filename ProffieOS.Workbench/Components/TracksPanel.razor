@@ -2,21 +2,21 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<div class="panel">
-    <div class="panel-label">
-        <span class="panel-label-text">tracks</span>
+<div class="panel work-panel">
+    <div class="panel-topline">
+        <span class="panel-dot"></span>
+        <span class="panel-topline-text">tracks</span>
     </div>
     <div class="panel-scroll">
         @if (!State.TrackList.Any())
         {
-            <MudText Typo="Typo.caption" Class="pa-4"
-                     Style="color:rgba(176,216,248,0.36); font-family:sans-serif;">
-                Waiting for track list...
+            <MudText Typo="Typo.caption" Class="empty-state-note">
+                waiting for track list...
             </MudText>
         }
         else
         {
-            <MudList T="string" Dense="true" Style="background:transparent; padding:4px 0;">
+            <MudList T="string" Dense="true" Class="track-list">
                 @foreach (var track in State.TrackList)
                 {
                     if (track.Length <= 4) continue;
@@ -28,12 +28,11 @@
                     <MudListItem T="string"
                                  Class="@($"track-list-item{(isPlaying ? " active-track" : "")}")"
                                  OnClick="@(async _ => await PlayTrack(t))">
-                        <div style="display:flex; align-items:center; gap:10px;">
+                        <div class="track-row">
                             <MudIcon Icon="@(isPlaying ? Icons.Material.Filled.PlayArrow : Icons.Material.Filled.MusicNote)"
                                      Size="Size.Small"
-                                     Style="@($"color:{(isPlaying ? "#c0dcff" : "rgba(176,216,248,0.34)")};")"/>
-                            <span class="starjedi-title"
-                                  style="font-size:0.80rem; @(isPlaying ? "text-shadow:0 0 10px rgba(0,210,255,0.60);" : "opacity:0.70;")">
+                                     Class="@(isPlaying ? "track-icon playing" : "track-icon")" />
+                            <span class="starjedi-title track-name @(isPlaying ? "is-playing" : "")">
                                 @title
                             </span>
                         </div>

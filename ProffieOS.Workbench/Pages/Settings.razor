@@ -4,14 +4,12 @@
 @inject NavigationManager Nav
 @inject ISnackbar Snackbar
 
-<PageTitle>ProffieOS Workbench – Settings</PageTitle>
+<PageTitle>proffieos workbench – settings</PageTitle>
 
 @if (Connection.State == ConnectionState.Disconnected)
 {
-    <div class="hs-screen">
-        <div class="hs-brand">
-            <span class="starjedi-title hs-title">disconnected</span>
-        </div>
+    <div class="status-shell panel-surface">
+        <h1 class="starjedi-title status-title">disconnected</h1>
         <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="saber-btn"
                    OnClick="@(() => Nav.NavigateTo(""))">
             reconnect
@@ -20,27 +18,29 @@
     return;
 }
 
-<header class="wb-header">
-    <MudTooltip Text="Back to dashboard" Placement="Placement.Bottom" Delay="400">
-        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
-                       Class="wb-icon-btn"
-                       OnClick="@(() => Nav.NavigateTo("dashboard"))" />
-    </MudTooltip>
-    <span class="starjedi-title wb-title">settings</span>
-    <div class="wb-header-spacer"></div>
-</header>
+<div class="page-shell">
+    <header class="topbar panel-surface">
+        <MudTooltip Text="back to dashboard" Placement="Placement.Bottom" Delay="400">
+            <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                           Class="deck-icon-btn"
+                           OnClick="@(() => Nav.NavigateTo("dashboard"))" />
+        </MudTooltip>
+        <div class="topbar-brand">
+            <p class="eyebrow">system configuration</p>
+            <span class="starjedi-title wb-title">settings</span>
+        </div>
+    </header>
 
-<div class="dashboard-panels">
-    @if (_isLoading)
-    {
-        <div class="panel settings-panel">
-            <div class="pa-4">
+    <div class="settings-layout">
+        @if (_isLoading)
+        {
+            <div class="loading-wrap panel-surface">
                 <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
             </div>
-        </div>
-    }
-    else
-    {
-        <SettingsPanel />
-    }
+        }
+        else
+        {
+            <SettingsPanel />
+        }
+    </div>
 </div>

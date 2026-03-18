@@ -2,7 +2,7 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<div class="cmd-grid">
+<div class="command-grid">
     <ControlButton Label="on"       Icon="@Icons.Material.Filled.PowerSettingsNew" Active="State.IsOn"  OnClick="TurnOn" />
     <ControlButton Label="off"      Icon="@Icons.Material.Filled.PowerOff"         Active="!State.IsOn" OnClick="TurnOff" />
     <ControlButton Label="clash"    Icon="@Icons.Material.Filled.Bolt"             OnClick='() => Cmd("clash")' />

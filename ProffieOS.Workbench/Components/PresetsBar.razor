@@ -2,15 +2,15 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<div class="presets-bar">
-    <div class="presets-bar-scroll">
+<div class="preset-dock panel-surface">
+    <div class="preset-dock-scroll">
         @for (var i = 0; i < State.Presets.Count; i++)
         {
             var idx = i;
             var preset = State.Presets[i];
             var isActive = idx == State.CurrentPresetIndex;
 
-            <MudPaper Class="@($"saber-card presets-bar-card{(isActive ? " active" : "")}")"
+            <MudPaper Class="@($"preset-chip{(isActive ? " is-active" : "")}")"
                       Elevation="0"
                       draggable="@(IsEditMode ? "true" : "false")"
                       @ondragstart="@(_ => StartDrag(idx))"
@@ -19,19 +19,19 @@
                       @onclick="@(_ => SelectPreset(idx))"
                       @ondblclick="@(_ => { if (IsEditMode) EditPreset(idx); })">
                 <span class="preset-index">@(idx + 1)</span>
-                <span class="starjedi-title card-title">@preset.Name.Replace("\\n", "\n")</span>
+                <span class="starjedi-title preset-name">@preset.Name.Replace("\\n", "\n").ToLowerInvariant()</span>
             </MudPaper>
         }
 
         @if (IsEditMode)
         {
-            <MudPaper Class="saber-card presets-bar-card action-card"
+            <MudPaper Class="preset-chip action-chip"
                       Elevation="0"
                       @onclick="AddPreset">
-                <span class="card-symbol">+</span>
+                <span class="chip-symbol">+</span>
             </MudPaper>
 
-            <MudPaper Class="saber-card presets-bar-card action-card danger-card"
+            <MudPaper Class="preset-chip action-chip danger-chip"
                       Elevation="0"
                       @ondrop="DropDelete"
                       @ondragover:preventDefault="true"

@@ -44,6 +44,8 @@ public class SaberConnectionService(IJSRuntime js, SaberCommandService commands)
     public bool BluetoothAvailable { get; private set; }
     public bool UsbAvailable { get; private set; }
     public string? ConnectedDeviceName { get; private set; }
+    public int ReconnectAttempt { get; private set; }
+    public string? LastDisconnectReason { get; private set; }
 
     public event Action? StateChanged;
 
@@ -109,6 +111,8 @@ public class SaberConnectionService(IJSRuntime js, SaberCommandService commands)
                 throw new Exception("Wrong password");
         }
 
+        ReconnectAttempt = 0;
+        LastDisconnectReason = null;
         commands.MarkConnected();
         SetState(ConnectionState.Connected);
     }
@@ -149,6 +153,8 @@ public class SaberConnectionService(IJSRuntime js, SaberCommandService commands)
         await js.InvokeVoidAsync("UsbInterop.connect", commands.DotNetRef);
         commands.SendBytesAsync = bytes => js.InvokeVoidAsync("UsbInterop.write", bytes).AsTask();
         _isBle = false;
+        ReconnectAttempt = 0;
+        LastDisconnectReason = null;
         commands.MarkConnected();
         SetState(ConnectionState.Connected);
     }
@@ -158,21 +164,28 @@ public class SaberConnectionService(IJSRuntime js, SaberCommandService commands)
         SetState(ConnectionState.Reconnecting);
         for (var attempt = 0; attempt < 10; attempt++)
         {
+            ReconnectAttempt = attempt + 1;
+            StateChanged?.Invoke();
             await Task.Delay(5000);
             try
             {
                 await js.InvokeVoidAsync("BluetoothInterop.reconnect", commands.DotNetRef);
+                ReconnectAttempt = 0;
+                LastDisconnectReason = null;
                 commands.MarkConnected();
                 SetState(ConnectionState.Connected);
                 return;
             }
             catch { /* keep retrying */ }
         }
+
+        LastDisconnectReason = "Reconnect timed out";
         SetState(ConnectionState.Disconnected);
     }
 
     private async Task HandleDisconnect()
     {
+        LastDisconnectReason = "Device disconnected";
         if (_isBle)
         {
             await ReconnectBleAsync();

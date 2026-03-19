@@ -7,7 +7,11 @@ public partial class ControlsLayout : IDisposable
 {
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
-    protected override void OnInitialized() => State.StateChanged += OnStateChanged;
+    protected override void OnInitialized()
+    {
+        State.StateChanged += OnStateChanged;
+        Connection.StateChanged += OnStateChanged;
+    }
 
     private void OnStateChanged() => InvokeAsync(StateHasChanged);
 
@@ -35,5 +39,9 @@ public partial class ControlsLayout : IDisposable
         catch (Exception ex) { Snackbar.Add(ex.Message, Severity.Error); }
     }
 
-    public void Dispose() => State.StateChanged -= OnStateChanged;
+    public void Dispose()
+    {
+        State.StateChanged -= OnStateChanged;
+        Connection.StateChanged -= OnStateChanged;
+    }
 }

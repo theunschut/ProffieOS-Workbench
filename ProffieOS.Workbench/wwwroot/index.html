@@ -51,7 +51,21 @@
     <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' });
+            const baseHref = document.querySelector('base')?.getAttribute('href') ?? '/';
+            const basePath = baseHref.endsWith('/') ? baseHref : `${baseHref}/`;
+            const swPath = `${basePath}service-worker.js`;
+
+            // Service worker is opt-in to avoid stale-cache issues during hardware stability testing.
+            // Enable by setting localStorage key "pwa-sw-enabled" to "true".
+            const swEnabled = localStorage.getItem('pwa-sw-enabled') === 'true';
+
+            if (swEnabled) {
+                navigator.serviceWorker.register(swPath, { updateViaCache: 'none' });
+            } else {
+                navigator.serviceWorker.getRegistration(swPath).then(reg => {
+                    if (reg) reg.unregister();
+                });
+            }
         }
     </script>
 </body>

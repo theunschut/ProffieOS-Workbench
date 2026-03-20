@@ -141,7 +141,8 @@ window.BluetoothInterop = (() => {
     return {
         async requestDevice(filters) {
             logInfo('Requesting BLE device', filters);
-            _device = await navigator.bluetooth.requestDevice({ filters });
+            const optionalServices = [...new Set(filters.flatMap(f => f.services ?? []))];
+            _device = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices });
             logInfo('BLE device selected', deviceLabel());
             return _device.name ?? 'Unknown Device';
         },

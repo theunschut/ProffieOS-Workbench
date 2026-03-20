@@ -33,7 +33,7 @@
                                ValueChanged="SaveFont">
                         @foreach (var f in State.FontList)
                         {
-                            <MudSelectItem T="string" Value="@f">@f.ToLowerInvariant()</MudSelectItem>
+                            <MudSelectItem T="string" Value="@f">@(f.Split('/')[^1].ToLowerInvariant())</MudSelectItem>
                         }
                     </MudSelect>
                 </MudPaper>
@@ -46,7 +46,7 @@
                                ValueChanged="SaveTrack">
                         @foreach (var t in State.TrackList)
                         {
-                            <MudSelectItem T="string" Value="@t">@t.ToLowerInvariant()</MudSelectItem>
+                            <MudSelectItem T="string" Value="@t">@(t.Split('/')[^1].Split('.')[0].ToLowerInvariant())</MudSelectItem>
                         }
                     </MudSelect>
                 </MudPaper>

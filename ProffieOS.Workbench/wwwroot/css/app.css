@@ -339,14 +339,15 @@ body::after {
 .app-shell,
 .page-shell {
     height: 100vh;
+    min-height: 0;
     display: grid;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto minmax(0, 1fr) auto;
     gap: 12px;
     padding: 14px;
 }
 
 .page-shell {
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
 }
 
 .topbar {
@@ -356,12 +357,15 @@ body::after {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    flex-wrap: wrap;
 }
 
 .topbar-brand {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    min-width: 0;
+    flex: 1 1 auto;
 }
 
 .wb-title {
@@ -373,6 +377,9 @@ body::after {
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
+    min-width: 0;
+    margin-left: auto;
+    justify-content: flex-end;
 }
 
 .topbar-action.is-active {
@@ -382,7 +389,9 @@ body::after {
 }
 
 .volume-block {
-    min-width: 240px;
+    min-width: 140px;
+    flex: 1 1 160px;
+    max-width: 280px;
     display: flex;
     align-items: center;
     gap: 7px;
@@ -427,21 +436,30 @@ body::after {
 
 .dashboard-grid {
     min-height: 0;
+    min-width: 0;
     display: grid;
-    grid-template-columns: 310px minmax(0, 1fr) 320px;
+    grid-template-columns: clamp(200px, 22vw, 310px) minmax(0, 1fr) clamp(200px, 22vw, 320px);
     gap: 12px;
 }
 
 .dashboard-panel {
     min-height: 0;
+    min-width: 0;
     border-radius: 16px;
     overflow: hidden;
     background: var(--panel);
     border: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-panel > .panel {
+    flex: 1;
 }
 
 .dashboard-center {
     min-height: 0;
+    min-width: 0;
     border-radius: 16px;
     padding: 20px;
     display: flex;
@@ -462,6 +480,21 @@ body::after {
     display: grid;
     gap: 8px;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.controls-layout-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.controls-layout-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.controls-layout-scroll::-webkit-scrollbar-thumb {
+    background: rgba(122, 214, 255, 0.42);
+    border-radius: 5px;
 }
 
 .command-grid > :last-child {
@@ -648,18 +681,31 @@ body::after {
 
 /* Preset dock/cards */
 .preset-dock {
+    min-width: 0;
     border-radius: 14px;
     padding: 8px;
 }
 
 .preset-dock-scroll {
     display: flex;
+    width: 100%;
+    max-width: 100%;
     gap: 8px;
     overflow-x: auto;
+    overflow-y: hidden;
+    touch-action: pan-x;
+    padding-bottom: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(122, 214, 255, 0.45) rgba(8, 22, 42, 0.5);
 }
 
 .preset-dock-scroll::-webkit-scrollbar {
     height: 6px;
+}
+
+.preset-dock-scroll::-webkit-scrollbar-track {
+    background: rgba(8, 22, 42, 0.5);
+    border-radius: 6px;
 }
 
 .preset-dock-scroll::-webkit-scrollbar-thumb {
@@ -671,6 +717,7 @@ body::after {
     position: relative;
     min-height: 72px;
     min-width: 112px;
+    flex: 0 0 auto;
     border-radius: 12px !important;
     border: 1px solid var(--line) !important;
     background: rgba(12, 31, 52, 0.9) !important;
@@ -797,14 +844,14 @@ body::after {
     flex: 1;
     min-height: 0;
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: 1fr 1fr;
     gap: 10px;
     padding: 8px;
 }
 
 .edit-column-left,
 .edit-column-right {
-    grid-column: span 2;
+    min-width: 0;
 }
 
 .edit-column-scroll {
@@ -824,7 +871,7 @@ body::after {
 
 .edit-column-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 10px;
     align-items: start;
 }
@@ -949,9 +996,17 @@ body::after {
     top: 0.45rem;
 }
 
-@media (max-width: 1200px) {
-    .dashboard-grid {
-        grid-template-columns: 260px minmax(0, 1fr) 280px;
+@media (max-width: 1280px) {
+    .app-shell.app-shell-editing .dashboard-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .app-shell.app-shell-editing .dashboard-grid > aside {
+        display: none;
+    }
+
+    .app-shell.app-shell-editing .dashboard-center {
+        padding: 10px;
     }
 }
 
@@ -968,11 +1023,6 @@ body::after {
     .edit-content,
     .edit-column-grid {
         grid-template-columns: 1fr;
-    }
-
-    .edit-column-left,
-    .edit-column-right {
-        grid-column: auto;
     }
 
     .edit-column-scroll {
@@ -994,6 +1044,7 @@ body::after {
 
 .center-workspace {
     min-height: 0;
+    min-width: 0;
     height: 100%;
     width: 100%;
     display: flex;
@@ -1003,4 +1054,55 @@ body::after {
 .center-workspace .panel {
     min-height: 0;
     height: 100%;
+}
+
+@media (max-width: 1360px) {
+    .edit-content {
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
+    .edit-column-scroll {
+        min-height: auto;
+        overflow: visible;
+        padding-right: 0;
+    }
+
+    .edit-column-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 1150px) {
+    .topbar-metrics {
+        width: 100%;
+        margin-left: 0;
+        justify-content: flex-start;
+    }
+
+    .volume-block {
+        min-width: 0;
+        max-width: none;
+        flex: 1 1 220px;
+    }
+}
+
+@media (max-width: 760px) {
+    .arg-row {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .arg-label {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .arg-input,
+    .arg-row .saber-input {
+        width: 100%;
+        min-width: 0;
+    }
 }

@@ -3,30 +3,32 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-@if (Connection.State == ConnectionState.Reconnecting || !string.IsNullOrWhiteSpace(Connection.LastDisconnectReason))
-{
-    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mb-3">
-        @if (Connection.State == ConnectionState.Reconnecting)
-        {
-            <span>reconnect attempt @Connection.ReconnectAttempt/10</span>
-        }
-        @if (!string.IsNullOrWhiteSpace(Connection.LastDisconnectReason))
-        {
-            <span class="ml-2">last disconnect: @Connection.LastDisconnectReason</span>
-        }
-    </MudAlert>
-}
+<div class="controls-layout-scroll">
+    @if (Connection.State == ConnectionState.Reconnecting || !string.IsNullOrWhiteSpace(Connection.LastDisconnectReason))
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mb-3">
+            @if (Connection.State == ConnectionState.Reconnecting)
+            {
+                <span>reconnect attempt @Connection.ReconnectAttempt/10</span>
+            }
+            @if (!string.IsNullOrWhiteSpace(Connection.LastDisconnectReason))
+            {
+                <span class="ml-2">last disconnect: @Connection.LastDisconnectReason</span>
+            }
+        </MudAlert>
+    }
 
-<div class="command-grid">
-    <ControlButton Label="on"       Icon="@Icons.Material.Filled.PowerSettingsNew" Active="State.IsOn"  OnClick="TurnOn" />
-    <ControlButton Label="off"      Icon="@Icons.Material.Filled.PowerOff"         Active="!State.IsOn" OnClick="TurnOff" />
-    <ControlButton Label="clash"    Icon="@Icons.Material.Filled.Bolt"             OnClick='() => Cmd("clash")' />
-    <ControlButton Label="blast"    Icon="@Icons.Material.Filled.FlashOn"          OnClick='() => Cmd("blast")' />
-    <ControlButton Label="force"    Icon="@Icons.Material.Filled.AutoAwesome"      OnClick='() => Cmd("force")' />
-    <ControlButton Label="lockup"   Icon="@Icons.Material.Filled.Lock"             OnClick='() => Cmd("lockup")' />
-    <ControlButton Label="drag"     Icon="@Icons.Material.Filled.DragIndicator"    OnClick='() => Cmd("drag")' />
-    <ControlButton Label="melt"     Icon="@Icons.Material.Filled.Whatshot"         OnClick='() => Cmd("melt")' />
-    <ControlButton Label="stab"     Icon="@Icons.Material.Filled.NorthEast"        OnClick='() => Cmd("stab")' />
-    <ControlButton Label="lightning" Icon="@Icons.Material.Filled.ElectricBolt"   OnClick='() => Cmd("lblock")' />
-    <ControlButton Label="stop track" Icon="@Icons.Material.Filled.StopCircle"    OnClick="StopTrack" />
+    <div class="command-grid">
+        <ControlButton Label="on"       Icon="@Icons.Material.Filled.PowerSettingsNew" Active="State.IsOn"  OnClick="TurnOn" />
+        <ControlButton Label="off"      Icon="@Icons.Material.Filled.PowerOff"         Active="!State.IsOn" OnClick="TurnOff" />
+        <ControlButton Label="clash"    Icon="@Icons.Material.Filled.Bolt"             OnClick='() => Cmd("clash")' />
+        <ControlButton Label="blast"    Icon="@Icons.Material.Filled.FlashOn"          OnClick='() => Cmd("blast")' />
+        <ControlButton Label="force"    Icon="@Icons.Material.Filled.AutoAwesome"      OnClick='() => Cmd("force")' />
+        <ControlButton Label="lockup"   Icon="@Icons.Material.Filled.Lock"             OnClick='() => Cmd("lockup")' />
+        <ControlButton Label="drag"     Icon="@Icons.Material.Filled.DragIndicator"    OnClick='() => Cmd("drag")' />
+        <ControlButton Label="melt"     Icon="@Icons.Material.Filled.Whatshot"         OnClick='() => Cmd("melt")' />
+        <ControlButton Label="stab"     Icon="@Icons.Material.Filled.NorthEast"        OnClick='() => Cmd("stab")' />
+        <ControlButton Label="lightning" Icon="@Icons.Material.Filled.ElectricBolt"   OnClick='() => Cmd("lblock")' />
+        <ControlButton Label="stop track" Icon="@Icons.Material.Filled.StopCircle"    OnClick="StopTrack" />
+    </div>
 </div>

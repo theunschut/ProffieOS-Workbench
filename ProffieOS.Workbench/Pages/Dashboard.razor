@@ -19,7 +19,7 @@
     return;
 }
 
-<div class="app-shell">
+<div class="@($"app-shell{(HasCenterOverlay ? " app-shell-editing" : "")}")">
     @if (Connection.State == ConnectionState.Reconnecting)
     {
         <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Class="reconnecting-banner">

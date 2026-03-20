@@ -21,14 +21,8 @@ public partial class Home
 
     private void TogglePasswordField()
     {
-        if (!_showPassword)
-        {
-            _showPassword = true;
-        }
-        else
-        {
-            _ = ConnectBleAsync();
-        }
+        _showPassword = true;
+        _ = ConnectBleAsync();
     }
 
     private async Task OnPasswordKeyDown(KeyboardEventArgs e)
@@ -39,6 +33,9 @@ public partial class Home
 
     private async Task ConnectBleAsync()
     {
+        if (_busy)
+            return;
+
         _busy = true;
         _connectingVia = "ble";
         try

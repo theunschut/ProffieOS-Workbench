@@ -39,6 +39,7 @@ public class SaberConnectionService(IJSRuntime js, SaberCommandService commands)
     ];
 
     private bool _isBle;
+    private bool _disconnectHandlerRegistered;
 
     public ConnectionState State { get; private set; } = ConnectionState.Disconnected;
     public bool BluetoothAvailable { get; private set; }
@@ -53,7 +54,12 @@ public class SaberConnectionService(IJSRuntime js, SaberCommandService commands)
     {
         BluetoothAvailable = await js.InvokeAsync<bool>("eval", "typeof navigator.bluetooth !== 'undefined'");
         UsbAvailable = await js.InvokeAsync<bool>("eval", "typeof navigator.usb !== 'undefined'");
-        commands.OnDisconnectedAsync += HandleDisconnect;
+
+        if (!_disconnectHandlerRegistered)
+        {
+            commands.OnDisconnectedAsync += HandleDisconnect;
+            _disconnectHandlerRegistered = true;
+        }
     }
 
     public async Task ConnectBleAsync(string? password = null)
@@ -183,6 +189,35 @@ public class SaberConnectionService(IJSRuntime js, SaberCommandService commands)
         SetState(ConnectionState.Disconnected);
     }
 
+    public async Task ReconnectUsbAsync()
+    {
+        SetState(ConnectionState.Reconnecting);
+        for (var attempt = 0; attempt < 10; attempt++)
+        {
+            ReconnectAttempt = attempt + 1;
+            StateChanged?.Invoke();
+
+            var delayMs = Math.Min(1000 + attempt * 500, 5000);
+            await Task.Delay(delayMs);
+
+            try
+            {
+                await js.InvokeVoidAsync("UsbInterop.reconnect", commands.DotNetRef);
+                commands.SendBytesAsync = bytes => js.InvokeVoidAsync("UsbInterop.write", bytes).AsTask();
+                _isBle = false;
+                ReconnectAttempt = 0;
+                LastDisconnectReason = null;
+                commands.MarkConnected();
+                SetState(ConnectionState.Connected);
+                return;
+            }
+            catch { /* keep retrying */ }
+        }
+
+        LastDisconnectReason = "Reconnect timed out";
+        SetState(ConnectionState.Disconnected);
+    }
+
     private async Task HandleDisconnect()
     {
         LastDisconnectReason = "Device disconnected";
@@ -192,7 +227,7 @@ public class SaberConnectionService(IJSRuntime js, SaberCommandService commands)
         }
         else
         {
-            SetState(ConnectionState.Disconnected);
+            await ReconnectUsbAsync();
         }
     }
 

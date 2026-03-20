@@ -167,6 +167,34 @@ window.BluetoothInterop = (() => {
         return normalized;
     }
 
+    async function writeTxValue(bytes) {
+        const payload = new Uint8Array(bytes);
+
+        if (_tx?.properties?.writeWithoutResponse && typeof _tx.writeValueWithoutResponse === 'function') {
+            try {
+                await _tx.writeValueWithoutResponse(payload);
+                return;
+            } catch { }
+        }
+
+        if (typeof _tx?.writeValue === 'function') {
+            await _tx.writeValue(payload);
+            return;
+        }
+
+        if (typeof _tx?.writeValueWithResponse === 'function') {
+            await _tx.writeValueWithResponse(payload);
+            return;
+        }
+
+        if (typeof _tx?.writeValueWithoutResponse === 'function') {
+            await _tx.writeValueWithoutResponse(payload);
+            return;
+        }
+
+        throw new Error('No supported BLE write method on TX characteristic');
+    }
+
     return {
         async requestDevice(filters) {
             logInfo('Requesting BLE device', filters);
@@ -202,7 +230,7 @@ window.BluetoothInterop = (() => {
             let lastError = null;
             for (let attempt = 0; attempt < 3; attempt++) {
                 try {
-                    await _tx.writeValue(new Uint8Array(bytes));
+                    await writeTxValue(bytes);
                     return;
                 } catch (e) {
                     lastError = e;

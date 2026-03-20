@@ -12,6 +12,17 @@ window.BluetoothInterop = (() => {
     let _disconnectHandler = null;
     let _connectSeq = 0;
 
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    function deviceLabel(device = _device) {
+        if (!device) return 'no-device';
+        return device.name || 'BLE Device';
+    }
+
+    function logInfo(message, extra) { console.info('[BluetoothInterop]', message, extra ?? ''); }
+    function logWarn(message, extra) { console.warn('[BluetoothInterop]', message, extra ?? ''); }
+    function logError(message, extra) { console.error('[BluetoothInterop]', message, extra ?? ''); }
+
     async function detachHandlers() {
         try {
             if (_rx && _rxHandler)
@@ -59,6 +70,7 @@ window.BluetoothInterop = (() => {
         _dotnetRef = dotnetRef;
         const seq = ++_connectSeq;
 
+        logInfo('Starting BLE connect/reconnect flow', { seq, device: deviceLabel() });
         await resetConnectionState();
 
         if (_device?.gatt?.connected) {
@@ -117,15 +129,20 @@ window.BluetoothInterop = (() => {
 
         _disconnectHandler = () => {
             if (seq !== _connectSeq) return;
+            logWarn('BLE disconnect event received', { seq, device: deviceLabel() });
             resetConnectionState().catch(() => { });
             dotnetRef.invokeMethodAsync('OnDisconnected');
         };
         _device.addEventListener('gattserverdisconnected', _disconnectHandler);
+
+        logInfo('BLE connected', { seq, device: deviceLabel(), txUuid, rxUuid, statusUuid, hasPw: !!pwUuid });
     }
 
     return {
         async requestDevice(filters) {
+            logInfo('Requesting BLE device', filters);
             _device = await navigator.bluetooth.requestDevice({ filters });
+            logInfo('BLE device selected', deviceLabel());
             return _device.name ?? 'Unknown Device';
         },
 
@@ -136,17 +153,38 @@ window.BluetoothInterop = (() => {
 
         async reconnect(dotnetRef) {
             if (!_device || !_savedProfiles) throw new Error('No device to reconnect to');
+            logInfo('Reconnect requested', deviceLabel());
             await connectInternal(dotnetRef, _savedProfiles);
         },
 
         async writeChunk(bytes) {
             if (!_tx) throw new Error('Not connected');
-            await _tx.writeValue(new Uint8Array(bytes));
+
+            let lastError = null;
+            for (let attempt = 0; attempt < 3; attempt++) {
+                try {
+                    await _tx.writeValue(new Uint8Array(bytes));
+                    return;
+                } catch (e) {
+                    lastError = e;
+                    logWarn('BLE writeChunk failed', { attempt: attempt + 1, byteLength: bytes?.length ?? 0, error: e });
+                    await delay(20 * (attempt + 1));
+                }
+            }
+
+            logError('BLE writeChunk failed after retries', lastError);
+            throw lastError ?? new Error('BLE write failed');
         },
 
         async sendPassword(password) {
             if (!_pw) return;
-            await _pw.writeValue(new TextEncoder().encode(password));
+            try {
+                await _pw.writeValue(new TextEncoder().encode(password));
+                logInfo('BLE password sent');
+            } catch (e) {
+                logWarn('BLE password send failed', e);
+                throw e;
+            }
         },
 
         async selectKnownDevice(index) {
@@ -154,6 +192,7 @@ window.BluetoothInterop = (() => {
             const devices = await navigator.bluetooth.getDevices();
             if (index >= devices.length) throw new Error('Device not found');
             _device = devices[index];
+            logInfo('Known BLE device selected', deviceLabel());
             return _device.name ?? 'BLE Device';
         },
 

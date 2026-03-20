@@ -7,12 +7,13 @@ A web-based remote control for [ProffieOS](https://github.com/profezzorn/Proffie
 ## Features
 
 - Connect via **BLE** (multiple UART profiles supported) or **WebUSB**
+- Reconnect to previously authorized known devices (BLE/USB)
 - Browse and activate **presets**
 - Play **tracks** from the SD card
 - Send **control commands** (on/off, clash, blast, force, lockup, drag, melt, stab, lightning)
 - **Edit presets**: name, font, track, blade styles (with color/int argument editors), variation
 - **Settings**: brightness, clash threshold, blade length, gesture ignition options
-- Auto-reconnect on BLE disconnect
+- Auto-reconnect on disconnect (BLE and USB)
 - Toast notifications for errors
 - PWA — installable, works offline after first load
 
@@ -25,7 +26,7 @@ A web-based remote control for [ProffieOS](https://github.com/profezzorn/Proffie
 
 - [Blazor WebAssembly](https://learn.microsoft.com/en-us/aspnet/core/blazor/) (.NET 10)
 - [MudBlazor](https://mudblazor.com/) component library (dark theme)
-- Minimal JavaScript — only thin wrappers over browser BLE/USB APIs
+- Lightweight JavaScript interop over browser BLE/USB APIs, with connection resilience and diagnostics
 
 ## Running locally
 
@@ -33,7 +34,7 @@ A web-based remote control for [ProffieOS](https://github.com/profezzorn/Proffie
 dotnet run --project ProffieOS.Workbench
 ```
 
-Then open `https://localhost:5001` in Chrome or Edge.
+Then open the URL printed by `dotnet run` (default launch profile uses `https://localhost:7054` and `http://localhost:5135`).
 
 ## Deployment
 

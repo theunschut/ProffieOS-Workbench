@@ -75,13 +75,18 @@ public class SaberStateService(SaberCommandService commands)
     private async Task Sync()
     {
         var x = 42;
-        while (true)
+        for (var attempt = 0; attempt < 40; attempt++)
         {
             var cmd = $"fnord{x}";
             var str = await commands.Send(cmd);
-            if (str.StartsWith($"Whut? :{cmd}")) break;
+            if (str.StartsWith($"Whut? :{cmd}"))
+                return;
+
             x++;
+            await Task.Delay(50);
         }
+
+        throw new Exception("Failed to synchronize with device command channel");
     }
 
     private async Task LoadPresets()

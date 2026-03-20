@@ -138,12 +138,39 @@ window.BluetoothInterop = (() => {
         logInfo('BLE connected', { seq, device: deviceLabel(), txUuid, rxUuid, statusUuid, hasPw: !!pwUuid });
     }
 
+    function toJsArray(value) {
+        if (Array.isArray(value)) return value;
+        if (!value) return [];
+        if (Array.isArray(value.$values)) return value.$values;
+        if (typeof value.length === 'number') {
+            try { return Array.from(value); } catch { }
+        }
+        if (typeof value === 'object') {
+            return Object.values(value).filter(v => v && typeof v === 'object');
+        }
+        return [];
+    }
+
+    function normalizeServiceFilters(filters) {
+        const candidates = toJsArray(filters);
+        const normalized = [];
+
+        for (const candidate of candidates) {
+            const servicesRaw = candidate?.services;
+            const services = toJsArray(servicesRaw)
+                .filter(s => typeof s === 'string' && s.length > 0);
+
+            if (services.length > 0)
+                normalized.push({ services });
+        }
+
+        return normalized;
+    }
+
     return {
         async requestDevice(filters) {
             logInfo('Requesting BLE device', filters);
-            const serviceFilters = Array.isArray(filters)
-                ? filters.filter(f => Array.isArray(f?.services) && f.services.length > 0)
-                : [];
+            const serviceFilters = normalizeServiceFilters(filters);
             const optionalServices = [...new Set(serviceFilters.flatMap(f => f.services ?? []))];
 
             const requestOptions = serviceFilters.length > 0

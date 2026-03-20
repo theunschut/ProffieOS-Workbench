@@ -12,6 +12,16 @@ window.BluetoothInterop = (() => {
     let _disconnectHandler = null;
     let _connectSeq = 0;
 
+    const LegacyServiceUuids = [
+        '713d0000-389c-f637-b1d7-91b361ae7678',
+        '6e400001-b5a3-f393-e0a9-e50e24dcca9e',
+        '49535343-fe7d-4ae5-8fa9-9fafd205e455',
+        '0000fff0-0000-1000-8000-00805f9b34fb',
+        '0000ffe0-0000-1000-8000-00805f9b34fb',
+        '0000fefb-0000-1000-8000-00805f9b34fb',
+        '569a1101-b87f-490c-92cb-11ba5ea5167c'
+    ];
+
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     function deviceLabel(device = _device) {
@@ -198,11 +208,11 @@ window.BluetoothInterop = (() => {
     return {
         async requestDevice(filters) {
             logInfo('Requesting BLE device', filters);
-            const serviceFilters = normalizeServiceFilters(filters);
+            let serviceFilters = normalizeServiceFilters(filters);
 
             if (serviceFilters.length === 0) {
-                logError('No valid BLE service filters were provided', filters);
-                throw new Error('No valid BLE service filters provided');
+                serviceFilters = LegacyServiceUuids.map(uuid => ({ services: [uuid] }));
+                logWarn('Using fallback legacy BLE service filters', serviceFilters);
             }
 
             const optionalServices = [...new Set(serviceFilters.flatMap(f => f.services ?? []))];

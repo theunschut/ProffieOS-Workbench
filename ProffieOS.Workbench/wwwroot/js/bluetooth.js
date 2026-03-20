@@ -146,7 +146,7 @@ window.BluetoothInterop = (() => {
             try { return Array.from(value); } catch { }
         }
         if (typeof value === 'object') {
-            return Object.values(value).filter(v => v && typeof v === 'object');
+            return Object.values(value);
         }
         return [];
     }
@@ -171,11 +171,14 @@ window.BluetoothInterop = (() => {
         async requestDevice(filters) {
             logInfo('Requesting BLE device', filters);
             const serviceFilters = normalizeServiceFilters(filters);
-            const optionalServices = [...new Set(serviceFilters.flatMap(f => f.services ?? []))];
 
-            const requestOptions = serviceFilters.length > 0
-                ? { filters: serviceFilters, optionalServices }
-                : { acceptAllDevices: true, optionalServices };
+            if (serviceFilters.length === 0) {
+                logError('No valid BLE service filters were provided', filters);
+                throw new Error('No valid BLE service filters provided');
+            }
+
+            const optionalServices = [...new Set(serviceFilters.flatMap(f => f.services ?? []))];
+            const requestOptions = { filters: serviceFilters, optionalServices };
 
             _device = await navigator.bluetooth.requestDevice(requestOptions);
             logInfo('BLE device selected', deviceLabel());

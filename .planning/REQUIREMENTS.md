@@ -57,24 +57,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CONN-01 | TBD | Pending |
-| CONN-02 | TBD | Pending |
-| CONN-03 | TBD | Pending |
-| ERR-01 | TBD | Pending |
-| ERR-02 | TBD | Pending |
-| WRITE-01 | TBD | Pending |
-| WRITE-02 | TBD | Pending |
-| WRITE-03 | TBD | Pending |
-| WRITE-04 | TBD | Pending |
-| WRITE-05 | TBD | Pending |
-| WRITE-06 | TBD | Pending |
-| AUDIT-01 | TBD | Pending |
+| CONN-01 | Phase 2 | Pending |
+| CONN-02 | Phase 2 | Pending |
+| CONN-03 | Phase 2 | Pending |
+| ERR-01 | Phase 1 | Pending |
+| ERR-02 | Phase 1 | Pending |
+| WRITE-01 | Phase 4 | Pending |
+| WRITE-02 | Phase 3 | Pending |
+| WRITE-03 | Phase 3 | Pending |
+| WRITE-04 | Phase 3 | Pending |
+| WRITE-05 | Phase 3 | Pending |
+| WRITE-06 | Phase 3 | Pending |
+| AUDIT-01 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 12 total
-- Mapped to phases: 0 (pending roadmap creation)
-- Unmapped: 12 ⚠️ (roadmap creation will assign phases)
+- Mapped to phases: 12 ✓
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-07-01*
-*Last updated: 2026-07-01 after initial definition*
+*Last updated: 2026-07-01 after roadmap creation*

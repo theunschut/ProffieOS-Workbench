@@ -28,7 +28,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. When a setting (swing-on-speed, blade length, timing, sensitivity, or any other) fails to load from a connected board, the user sees a visible error/retry indicator for that specific setting instead of it silently vanishing from the panel
   2. The settings UI clearly distinguishes "this board's firmware doesn't support this setting" from "reading this setting failed" — verifiable by comparing a firmware-unsupported setting against a forced read failure on the real USB board
   3. Background load failures (e.g. `LoadSettingsBackgroundAsync`) surface to the user regardless of which page is currently mounted, instead of being swallowed by a bare `catch {}`
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 01-01-PLAN.md — Typed exception foundation: SaberProtocolException hierarchy, Send2()/Send() throw+classify+log, full SaberStateService call-site migration, live-board Whut? classification verification
+- [ ] 01-02-PLAN.md — Visible capability: FailedSetting model + FailedSettings/SettingsLoadFailed on state, D-01 panel error banner + retry, D-04 global cross-page toast in MainLayout
 
 ### Phase 2: Connection Validation & Disconnect Handling
 **Mode:** mvp
@@ -71,7 +73,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Error Surfacing | 0/TBD | Not started | - |
+| 1. Error Surfacing | 0/2 | Not started | - |
 | 2. Connection Validation & Disconnect Handling | 0/TBD | Not started | - |
 | 3. Timeout & Watchdog Rework | 0/TBD | Not started | - |
 | 4. Write Confirmation & Parity Audit | 0/TBD | Not started | - |

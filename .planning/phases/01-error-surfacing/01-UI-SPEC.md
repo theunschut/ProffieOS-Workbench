@@ -31,21 +31,20 @@ created: 2026-07-04
 
 ## Spacing Scale
 
-Declared values (must be multiples of 4) — confirming existing codebase convention, no changes:
+Declared values (must be multiples of 4) — scoped strictly to the tokens Phase 1's new UI elements (error banner, per-item retry control, toast) actually consume. This phase adds no new spacing values and does not modify or depend on `.page-shell` or any other pre-existing container padding, so those pre-existing (non-4-multiple) values are intentionally excluded from this table rather than declared as part of the contract:
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| xs | 4px | Icon gaps, scrollbar width, inline padding (`.panel-scroll` padding, `.arg-row` gap on mobile) |
-| sm | 8px | Compact element spacing (`.settings-groups` gap, `.field-card` padding base unit) |
-| md | 12–16px | Default element spacing (`.field-card` padding: 12px; `.dashboard-grid`/`.editor-layout` gap: 12px; `.page-shell` padding: 14px) |
-| lg | 24px | Section padding (landing/dashboard shell padding: 22px, rounded to 24px token) |
-| xl | 32px | Layout gaps (large breakpoint transitions) |
-| 2xl | 48px | Major section breaks (not currently used in Phase 1 surfaces) |
-| 3xl | 64px | Page-level spacing (not currently used in Phase 1 surfaces) |
+| xs | 4px | Icon gaps within the retry button/icon pairing (MudBlazor default) |
+| sm | 8px | Compact spacing between banner rows (`.settings-groups`-equivalent gap used inside the banner's failed-item list) |
+| md | 16px | Default `MudAlert` internal padding and gap between banner and `.settings-groups` below it |
+| lg | 24px | Not directly used by Phase 1's new elements; retained for completeness of the base scale |
 
 **Exceptions for this phase:**
 - New error banner (D-01) reuses the exact spacing already established by `.reconnecting-banner` (`MudAlert` with `margin: 0`, default `MudAlert` internal padding) — no new spacing values introduced.
 - New per-item retry button inside the banner: use MudBlazor's default `MudButton` `Size.Small` padding (not a custom value) to stay inside the existing 4px-multiple system without a new token.
+
+**Note:** The broader codebase contains pre-existing spacing values outside the 4-multiple grid (e.g. `.page-shell { padding: 14px; }`, shell padding at 22px). These are a documented pre-existing deviation elsewhere in the app. Phase 1 does not modify, extend, or rely on `.page-shell` or these values — its new surfaces (banner, retry button, toast) are additive to `SettingsPanel.razor` and the root layout only, so they are out of scope for this contract and are not declared here.
 
 ---
 
@@ -90,6 +89,12 @@ Confirming existing `PaletteDark` theme (`MainLayout.razor.cs`) and `app.css` cu
 
 ---
 
+## Visual Hierarchy
+
+**Focal point:** When `State.FailedSettings.Any()` is true, the panel-level error banner (D-01, `MudAlert Severity="Severity.Error"`) is the primary visual anchor of the Settings panel screen — its filled red surface sits above `.settings-groups` and draws the eye before any individual setting row. When no failures exist, the banner is absent entirely and the existing `.settings-groups` layout remains the unchanged, sole focal point (no change from current behavior). The banner never competes with the `.reconnecting-banner` for primary focus — the two are mutually exclusive in practice (connection-loss vs. settings-load-failure are different moments in the interaction), and if both were ever visible simultaneously, standard document order (reconnecting banner is app-shell-level, above the page content) keeps the connection-state banner as the higher-priority anchor.
+
+---
+
 ## Copywriting Contract
 
 Per D-05, error copy carries a **specific reason**, never a generic "failed to load." Per CONTEXT.md's Claude's Discretion, exact wording is this agent's responsibility — the following is the prescriptive, final copy contract for Phase 1's three new user-facing surfaces (panel banner, global toast, retry button). All copy follows the existing codebase's lowercase, terse, StarJedi-flavored voice (see `panel-topline-text: "settings"`, `wb-title`, `.eyebrow` text) for structural chrome, but uses **sentence case for actual error messages** (matching existing `Snackbar.Add($"Failed to load settings: {ex.Message}", ...)` convention) since error text must be immediately scannable, not stylized.
@@ -98,7 +103,7 @@ Per D-05, error copy carries a **specific reason**, never a generic "failed to l
 |---------|------|
 | Panel banner heading | "Some settings couldn't be loaded" (`MudAlert Severity="Severity.Error"`, shown above the failed-settings list in `SettingsPanel.razor`, only when `State.FailedSettings.Count > 0`) |
 | Panel banner per-item row | `{Label}: {ex.Message}` — e.g. "clash threshold: Timed out waiting for board response" / "swing-on speed: Device disconnected while sending 'get_gesture swing_on'" — reuses the exact exception `.Message` values from the typed hierarchy in RESEARCH.md Pattern 1 verbatim; never re-wrap or genericize them |
-| Panel banner retry button (per item) | "Retry" (icon-optional; if using an icon, `Icons.Material.Filled.Refresh`, matching MudBlazor convention elsewhere in the app) |
+| Panel banner retry button (per item) | Visible text label: "Retry" — acceptable as a bare verb here because it renders directly adjacent to the failed setting's label in the same row (e.g. "clash threshold: Timed out waiting for board response  [Retry]"), so the row supplies the missing noun visually. If the button is ever rendered icon-only (`MudIconButton`, `Icons.Material.Filled.Refresh`, no visible text), it MUST carry `aria-label="Retry {Label}"` (e.g. `aria-label="Retry clash threshold"`) — a bare "Retry" aria-label is not sufficient without the row's visual context to disambiguate which setting it targets. |
 | Global toast (D-04, background load failure while on another page) | "Settings failed to load: {reason}" — reuses the exact existing `Snackbar.Add($"Failed to load settings: {ex.Message}", Severity.Error)` phrasing already used in `Settings.razor.cs`/`Dashboard.razor.cs` for consistency; do not invent new phrasing for what is functionally the same failure surfaced from a different trigger point |
 | Empty state (all settings loaded successfully, nothing failed) | No banner is rendered at all — banner presence is conditional on `FailedSettings.Any()`. There is no "0 failures" empty-state copy needed; absence of the banner IS the empty state. |
 | Unsupported setting (ERR-02, hidden case) | No copy — per D-02, unsupported settings render nothing at all (not even a placeholder row). This is a deliberate absence, not a state requiring copy. |
@@ -113,7 +118,7 @@ Since this is not a shadcn/registry-based project, this section replaces "Regist
 | Component | MudBlazor Type | Usage in Phase 1 |
 |-----------|----------------|-------------------|
 | Panel-level error banner | `MudAlert` (`Severity="Severity.Error"`, `Variant="Variant.Filled"` to match `.reconnecting-banner` precedent) | New: rendered inside `SettingsPanel.razor`, above `.settings-groups`, bound to `State.FailedSettings` |
-| Per-item retry action | `MudButton` (`Size="Size.Small"`, `Variant="Variant.Text"`, `Color="Color.Primary"`) or `MudIconButton` (`Icons.Material.Filled.Refresh`) | New: one per failed setting row inside the banner |
+| Per-item retry action | `MudButton` (`Size="Size.Small"`, `Variant="Variant.Text"`, `Color="Color.Primary"`, visible "Retry" text label) or `MudIconButton` (`Icons.Material.Filled.Refresh`, requires `aria-label="Retry {Label}"` per Copywriting Contract) | New: one per failed setting row inside the banner |
 | Global cross-page toast | `ISnackbar` / `Snackbar.Add(..., Severity.Error)` | Reused verbatim — existing mechanism, new trigger point (`SaberStateService.SettingsLoadFailed` event → subscribed once in `MainLayout.razor`/`MainLayout.razor.cs` per RESEARCH.md Pattern 4) |
 | Loading state (unchanged) | `MudProgressLinear Indeterminate="true"` | Existing — no change; Settings page loading indicator stays as-is |
 
